@@ -52,7 +52,8 @@ spec:
     namespace: "whereami"
   spec:
     ports:
-    - port: 5000
+    - port: 80
+      targetPort: 5000
       name: http # adding for Istio
     selector:
       app: "whereami"

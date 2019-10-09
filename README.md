@@ -55,14 +55,14 @@ kubectl annotate serviceaccount \
   iam.gke.io/gcp-service-account=$GSA_NAME@$PROJECT_ID.iam.gserviceaccount.com
 ```
 
-Verify that things are correct:
+Deploy the service/pods:
 ```
-kubectl run -it \
-  --generator=run-pod/v1 \
-  --image google/cloud-sdk \
-  --serviceaccount $KSA_NAME \
-  --namespace $K8S_NAMESPACE \
-  workload-identity-test
+kubectl apply -f k8s/
+```
 
-curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone
+Get the service endpoint:
 ```
+kubectl get svc/whereami -n whereami
+```
+
+Wrap things up by `curl`ing the `EXTERNAL-IP` of the service.
