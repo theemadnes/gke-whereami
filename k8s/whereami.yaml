@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whereami
+  namespace: whereami
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: whereami
+  template:
+    metadata:
+      labels:
+        app: whereami
+        version: v1
+        #track: stable
+    spec:
+      serviceAccountName: whereami-ksa
+      containers:
+      - name: whereami
+        image: gcr.io/alexmattson-scratch/gke-whereami@sha256:ed3bf9b614b04e8a703da76f0f2a5225f55576661c5515567171f0b527239395
+        ports:
+          - name: http
+            containerPort: 5000
+        livenessProbe:
+          httpGet:
+              path: /healthz
+              port: 5000
+              scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 5000
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+      tolerations:
+      - key: "workload"
+        operator: "Equal"
+        value: "backend"
+        effect: "NoSchedule"
+      #nodeSelector:
+      #  workload: backend
+---
+  apiVersion: "v1"
+  kind: "Service"
+  metadata:
+    name: "whereami"
+    namespace: "whereami"
+  spec:
+    ports:
+    - port: 5000
+      name: http # adding for Istio
+    selector:
+      app: "whereami"
+    type: "LoadBalancer"

@@ -4,8 +4,7 @@ A simple Flask app for showing what node / zone / project / cluster a given K8s 
 
 ### Setup
 
-- create a regional GKE cluster with workload identity enabled 
-- ensure that HTTP load balancing is enabled for the GKE cluster (this is the default)
+Create a regional GKE cluster with workload identity enabled 
 
 First define your environment variables (substituting where #needed#):
 
