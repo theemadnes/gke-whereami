@@ -106,3 +106,4 @@ venv.bak/
 lib/
 include/
 bin/
+pyvenv.cfg
