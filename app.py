@@ -36,16 +36,16 @@ def home():
 
         zone = None 
 
-    # get hostname 
+    # get gke node_name 
     try:
         r = requests.get(METADATA_URL + 'instance/hostname', headers=METADATA_HEADERS)
         if r.ok:
-            host_name = str(r.text)
+            node_name = str(r.text)
         else:
-            host_name = None
+            node_name = None
     except:
 
-        host_name = None
+        node_name = None
 
     # get cluster 
     try:
@@ -68,7 +68,7 @@ def home():
     payload['project_id'] = project_id
     payload['pod_name'] = pod_name
     payload['timestamp'] = timestamp
-    payload['host_name'] = host_name
+    payload['node_name'] = node_name
     payload['zone'] = zone
     payload['cluster_name'] = cluster_name
 
