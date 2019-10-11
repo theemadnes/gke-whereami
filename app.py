@@ -97,6 +97,6 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
     app.logger.handlers = []
     app.logger.propagate = True
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8080)
 
 
