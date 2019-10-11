@@ -4,6 +4,7 @@ import logging
 import json
 import sys
 import socket
+import os
 from datetime import datetime
 
 METADATA_URL = 'http://metadata.google.internal/computeMetadata/v1/'
@@ -64,13 +65,21 @@ def home():
     # get datetime
     timestamp=datetime.now().replace(microsecond=0).isoformat()
 
+    # get k8s namespace, pod ip, and pod service account 
+    pod_namespace = os.getenv('POD_NAMESPACE')
+    pod_ip = os.getenv('POD_IP')
+    pod_service_account = os.getenv('POD_SERVICE_ACCOUNT')
+
     payload = {}
-    payload['project_id'] = project_id
-    payload['pod_name'] = pod_name
-    payload['timestamp'] = timestamp
-    payload['node_name'] = node_name
-    payload['zone'] = zone
     payload['cluster_name'] = cluster_name
+    payload['node_name'] = node_name
+    payload['pod_ip'] = pod_ip
+    payload['pod_name'] = pod_name
+    payload['pod_namespace'] = pod_namespace
+    payload['pod_service_account'] = pod_service_account
+    payload['project_id'] = project_id
+    payload['timestamp'] = timestamp
+    payload['zone'] = zone 
 
     return json.dumps(payload)
 
