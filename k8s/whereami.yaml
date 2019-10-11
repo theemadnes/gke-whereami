@@ -17,14 +17,14 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/alexmattson-scratch/gke-whereami:21d41ba803d1d60b73702cafb54ea651c7683670
+        image: gcr.io/alexmattson-scratch/gke-whereami:4b8f3c3a1489bc6a65a72e543cb9a5c8dae038eb
         ports:
           - name: http
-            containerPort: 5000
+            containerPort: 8080
         livenessProbe:
           httpGet:
               path: /healthz
-              port: 5000
+              port: 8080
               scheme: HTTP
           initialDelaySeconds: 5
           periodSeconds: 15
@@ -58,7 +58,7 @@ spec:
   spec:
     ports:
     - port: 80
-      targetPort: 5000
+      targetPort: 8080
       name: http # adding for Istio
     selector:
       app: "whereami"

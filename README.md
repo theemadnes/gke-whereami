@@ -72,3 +72,8 @@ Wrap things up by `curl`ing the `EXTERNAL-IP` of the service.
 Result:
 
 ```{"cluster_name": "whereami", "node_name": "gke-whereami-default-pool-b54d082a-bbqx.c.alexmattson-scratch.internal", "pod_ip": "10.4.1.8", "pod_name": "whereami-7d5d9b4bc6-5277b", "pod_namespace": "whereami", "pod_service_account": "whereami-ksa", "project_id": "alexmattson-scratch", "timestamp": "2019-10-11T03:28:34", "zone": "us-central1-a"}```
+
+
+#### Note
+
+The operating port of this service has been switched from `5000` to `8080` to work easily with Cloud Run.
