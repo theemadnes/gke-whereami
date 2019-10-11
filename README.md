@@ -62,7 +62,13 @@ kubectl apply -f k8s/
 
 Get the service endpoint:
 ```
-kubectl get svc/whereami -n whereami
+WHEREAMI_ENDPOINT=$(kubectl get svc --namespace=whereami | grep -v EXTERNAL-IP | awk '{ print $4}')
 ```
 
-Wrap things up by `curl`ing the `EXTERNAL-IP` of the service.
+Wrap things up by `curl`ing the `EXTERNAL-IP` of the service. 
+
+```curl $WHEREAMI_ENDPOINT```
+
+Result:
+
+```{"cluster_name": "whereami", "node_name": "gke-whereami-default-pool-b54d082a-bbqx.c.alexmattson-scratch.internal", "pod_ip": "10.4.1.8", "pod_name": "whereami-7d5d9b4bc6-5277b", "pod_namespace": "whereami", "pod_service_account": "whereami-ksa", "project_id": "alexmattson-scratch", "timestamp": "2019-10-11T03:28:34", "zone": "us-central1-a"}```
