@@ -17,7 +17,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/alexmattson-scratch/gke-whereami:c87f5e535a7fc92feab6be634187669ba3dbac16
+        image: gcr.io/alexmattson-scratch/gke-whereami:21d41ba803d1d60b73702cafb54ea651c7683670
         ports:
           - name: http
             containerPort: 5000
