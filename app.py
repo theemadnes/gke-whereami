@@ -6,11 +6,17 @@ import sys
 import socket
 import os
 from datetime import datetime
+import emoji
+import random
 
 METADATA_URL = 'http://metadata.google.internal/computeMetadata/v1/'
 METADATA_HEADERS = {'Metadata-Flavor': 'Google'}
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False # otherwise our emojis get hosed 
+
+# set up emoji list
+emoji_list = list(emoji.UNICODE_EMOJI)
 
 @app.route('/')
 def home():
@@ -72,6 +78,7 @@ def home():
 
     payload = {}
     payload['cluster_name'] = cluster_name
+    payload['emoji'] = random.choice(emoji_list)
     payload['node_name'] = node_name
     payload['pod_ip'] = pod_ip
     payload['pod_name'] = pod_name
@@ -97,6 +104,6 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
     app.logger.handlers = []
     app.logger.propagate = True
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 
 
