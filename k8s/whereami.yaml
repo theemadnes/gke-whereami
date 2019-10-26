@@ -2,12 +2,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: whereami-ksa
+  #namespace: whereami
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: whereami
-  namespace: whereami
+  #namespace: whereami
 spec:
   replicas: 3
   selector:
@@ -22,7 +23,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/alexmattson-scratch/gke-whereami:4b8f3c3a1489bc6a65a72e543cb9a5c8dae038eb
+        image: gcr.io/alexmattson-scratch/gke-whereami@sha256:28b4df712a370c61a5d56c995130bac229db4b92301c59df973a162a31d5bd63
         ports:
           - name: http
             containerPort: 8080
@@ -59,7 +60,7 @@ spec:
   kind: "Service"
   metadata:
     name: "whereami"
-    namespace: "whereami"
+    #namespace: "whereami"
   spec:
     ports:
     - port: 80
