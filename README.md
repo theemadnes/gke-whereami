@@ -1,5 +1,5 @@
 # gke-whereami
-A simple Flask app for showing what node / zone / project / cluster a given K8s pod is in
+A simple Flask app for showing what node / zone / project / cluster a given K8s pod is in. It includes an emoji that is hashed from the pod name, which makes it a little easier to visually track the pod you're dealing with.
 
 
 ### Setup
@@ -71,9 +71,9 @@ Wrap things up by `curl`ing the `EXTERNAL-IP` of the service.
 
 Result:
 
-```{"cluster_name": "whereami", "node_name": "gke-whereami-default-pool-b54d082a-bbqx.c.alexmattson-scratch.internal", "pod_ip": "10.4.1.8", "pod_name": "whereami-7d5d9b4bc6-5277b", "pod_namespace": "whereami", "pod_service_account": "whereami-ksa", "project_id": "alexmattson-scratch", "timestamp": "2019-10-11T03:28:34", "zone": "us-central1-a"}```
+```{"cluster_name":"acn-ips-01","node_name":"gke-acn-ips-01-default-pool-949017b6-chsz.c.alexmattson-scratch.internal","pod_ip":"10.56.1.10","pod_name":"whereami-764cb9d75c-7tccm","pod_name_emoji":"🌤","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2019-10-26T06:10:28","zone":"us-central1-f"}```
 
 
 #### Note
 
-The operating port of this service has been switched from `5000` to `8080` to work easily with Cloud Run.
+The operating port of this service has been switched from `5000` to `8080` to work easily with the managed version of Cloud Run.
