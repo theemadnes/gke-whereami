@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, request, Response
+from flask import Flask, request, Response, jsonify
 import logging
 import json
 import sys
@@ -78,7 +78,7 @@ def home():
 
     payload = {}
     payload['cluster_name'] = cluster_name
-    payload['emoji'] = str(random.choice(emoji_list)[0])
+    payload['emoji'] = random.choice(emoji_list)[0]
     payload['node_name'] = node_name
     payload['pod_ip'] = pod_ip
     payload['pod_name'] = pod_name
@@ -88,7 +88,8 @@ def home():
     payload['timestamp'] = timestamp
     payload['zone'] = zone 
 
-    return json.dumps(payload)
+    #return json.dumps(payload)
+    return jsonify(payload)
 
 @app.route('/healthz')
 def i_am_healthy():
