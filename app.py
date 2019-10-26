@@ -78,10 +78,11 @@ def home():
 
     payload = {}
     payload['cluster_name'] = cluster_name
-    payload['emoji'] = random.choice(emoji_list)
+    #payload['emoji'] = random.choice(emoji_list)
     payload['node_name'] = node_name
     payload['pod_ip'] = pod_ip
     payload['pod_name'] = pod_name
+    payload['pod_name_emoji'] = emoji_list[hash(pod_name) % len(emoji_list)]
     payload['pod_namespace'] = pod_namespace
     payload['pod_service_account'] = pod_service_account
     payload['project_id'] = project_id
