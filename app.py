@@ -78,7 +78,7 @@ def home():
 
     payload = {}
     payload['cluster_name'] = cluster_name
-    payload['emoji'] = random.choice(emoji_list)[0]
+    payload['emoji'] = random.choice(emoji_list)
     payload['node_name'] = node_name
     payload['pod_ip'] = pod_ip
     payload['pod_name'] = pod_name
