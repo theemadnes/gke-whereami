@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False # otherwise our emojis get hosed 
 
 # set up emoji list
-emoji_list = list(emoji.UNICODE_EMOJI)
+emoji_list = list(emoji.unicode_codes.UNICODE_EMOJI.keys())
 
 @app.route('/')
 def home():
@@ -78,7 +78,7 @@ def home():
 
     payload = {}
     payload['cluster_name'] = cluster_name
-    payload['emoji'] = random.choice(emoji_list)[0]
+    payload['emoji'] = str(random.choice(emoji_list)[0])
     payload['node_name'] = node_name
     payload['pod_ip'] = pod_ip
     payload['pod_name'] = pod_name
