@@ -8,12 +8,14 @@ import os
 from datetime import datetime
 import emoji
 import random
+from flask_cors import CORS
 
 METADATA_URL = 'http://metadata.google.internal/computeMetadata/v1/'
 METADATA_HEADERS = {'Metadata-Flavor': 'Google'}
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False # otherwise our emojis get hosed 
+CORS(app) # enable CORS 
 
 # set up emoji list
 emoji_list = list(emoji.unicode_codes.UNICODE_EMOJI.keys())
