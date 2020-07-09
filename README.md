@@ -75,6 +75,10 @@ kustomize build k8s-backend-overlay-example | kubectl apply -f -
 kubectl apply -k k8s-backend-overlay-example
 ```
 
+Once that service is up and running, modify `k8s/configmap.yaml`'s `BACKEND_ENABLED` to `"True"`. You will have to redeploy the pods in the whereami service as they will not automatically be created when you updated the configmap.
+
+If you wish to call a different backend service, modify `k8s/configmap.yaml`'s `BACKEND_SERVICE` to some other service name. 
+
 
 #### Note
 
