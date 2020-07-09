@@ -99,7 +99,7 @@ def home():
         backend_service = os.getenv('BACKEND_SERVICE')
 
         try:
-            r = requests.get(backend_service)
+            r = requests.get('http://' + backend_service)
             if r.ok:
                 backend_result = r.json()
             else:
