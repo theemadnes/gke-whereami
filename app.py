@@ -93,7 +93,10 @@ def home():
 
     # should we call a backend service? 
     call_backend = os.getenv('BACKEND_ENABLED')
-    print(call_backend)
+    if call_backend:
+        print("calling backend")
+    else:
+        print("not calling backend")
 
 
     #return json.dumps(payload)

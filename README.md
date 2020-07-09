@@ -34,11 +34,6 @@ gcloud container clusters get-credentials $CLUSTER_NAME --region $COMPUTE_REGION
 ```
 
 Deploy the service/pods:
-```
-kubectl apply -f k8s/
-```
-
-*or*
 
 ```
 kubectl apply -k k8s
