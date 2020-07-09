@@ -53,7 +53,7 @@ Result:
 ```{"cluster_name":"acn-ips-01","node_name":"gke-acn-ips-01-default-pool-949017b6-chsz.c.alexmattson-scratch.internal","pod_ip":"10.56.1.10","pod_name":"whereami-764cb9d75c-7tccm","pod_name_emoji":"🌤","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2019-10-26T06:10:28","zone":"us-central1-f"}```
 
 
-#### using `gke-whereami` to call other instances of itself 
+#### using gke-whereami to call downstream services 
 
 `gke-whereami` has an optional flag that will cause it to attempt to call another backend service within your GKE cluster (for example, a different, non-public instance of itself). 
 
