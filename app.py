@@ -89,7 +89,13 @@ def home():
     payload['pod_service_account'] = pod_service_account
     payload['project_id'] = project_id
     payload['timestamp'] = timestamp
-    payload['zone'] = zone 
+    payload['zone'] = zone
+
+    # should we call a backend service? 
+    if os.getenv('BACKEND_ENABLED'):
+        print("yes - " + os.getenv('BACKEND_ENABLED')) 
+    else:
+        print("no - " + os.getenv('BACKEND_ENABLED'))
 
     #return json.dumps(payload)
     return jsonify(payload)
