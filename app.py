@@ -92,10 +92,9 @@ def home():
     payload['zone'] = zone
 
     # should we call a backend service? 
-    if os.getenv('BACKEND_ENABLED'):
-        print("yes - " + os.getenv('BACKEND_ENABLED')) 
-    else:
-        print("no - " + os.getenv('BACKEND_ENABLED'))
+    call_backend = os.getenv('BACKEND_ENABLED')
+    print(os.getenv)
+
 
     #return json.dumps(payload)
     return jsonify(payload)
