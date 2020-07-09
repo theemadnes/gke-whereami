@@ -16,7 +16,6 @@ export PROJECT_ID=#YOUR_PROJECT_ID#
 export COMPUTE_REGION=#YOUR_COMPUTE_REGION#
 
 export CLUSTER_NAME=whereami
-
 ```
 
 Now create your resources:
@@ -30,20 +29,15 @@ gcloud beta container clusters create $CLUSTER_NAME \
   --num-nodes=1
 
 gcloud container clusters get-credentials $CLUSTER_NAME --region $COMPUTE_REGION
-
 ```
 
 Deploy the service/pods:
 
-```
-kubectl apply -k k8s
-```
+```kubectl apply -k k8s```
 
 *or*
 
-```
-kustomize build k8s | kubectl apply -f -
-```
+```kustomize build k8s | kubectl apply -f -```
 
 Get the service endpoint:
 ```
@@ -67,23 +61,17 @@ Result:
 
 First, build the non-public instance of `gke-whereami`:
 
-```
-kustomize build k8s-backend-overlay-example | kubectl apply -f -
-```
+```kustomize build k8s-backend-overlay-example | kubectl apply -f -```
 
 *or*
 
-```
-kubectl apply -k k8s-backend-overlay-example
-```
+```kubectl apply -k k8s-backend-overlay-example```
 
 Once that service is up and running, modify `k8s/configmap.yaml`'s `BACKEND_ENABLED` to `"True"`. You will have to redeploy the pods in the whereami service as they will not automatically be created when you updated the configmap.
 
 The (slightly busy-looking) result should look like this:
 
-```
-{"backend_result":{"cluster_name":"ph-demo-01","node_name":"gke-ph-demo-01-default-pool-94e7722b-nxgb.c.alexmattson-scratch.internal","pod_ip":"10.48.0.14","pod_name":"whereami-backend-d8fcc7b5b-dtrmx","pod_name_emoji":"👐🏽","pod_namespace":"default","pod_service_account":"whereami-ksa-backend","project_id":"alexmattson-scratch","timestamp":"2020-07-09T18:36:08","zone":"us-central1-a"},"cluster_name":"ph-demo-01","node_name":"gke-ph-demo-01-default-pool-2259626e-qqxj.c.alexmattson-scratch.internal","pod_ip":"10.48.2.17","pod_name":"whereami-99fd698f6-qhl7f","pod_name_emoji":"☂","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-09T18:36:08","zone":"us-central1-f"}
-```
+```{"backend_result":{"cluster_name":"ph-demo-01","node_name":"gke-ph-demo-01-default-pool-94e7722b-nxgb.c.alexmattson-scratch.internal","pod_ip":"10.48.0.14","pod_name":"whereami-backend-d8fcc7b5b-dtrmx","pod_name_emoji":"👐🏽","pod_namespace":"default","pod_service_account":"whereami-ksa-backend","project_id":"alexmattson-scratch","timestamp":"2020-07-09T18:36:08","zone":"us-central1-a"},"cluster_name":"ph-demo-01","node_name":"gke-ph-demo-01-default-pool-2259626e-qqxj.c.alexmattson-scratch.internal","pod_ip":"10.48.2.17","pod_name":"whereami-99fd698f6-qhl7f","pod_name_emoji":"☂","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-09T18:36:08","zone":"us-central1-f"}```
 
 If you wish to call a different backend service, modify `k8s/configmap.yaml`'s `BACKEND_SERVICE` to some other service name. 
 
