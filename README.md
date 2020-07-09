@@ -63,6 +63,8 @@ Result:
 
 `gke-whereami` has an optional flag that will cause it to attempt to call another backend service within your GKE cluster (for example, a different, non-public instance of itself). 
 
+*NOTE:* this backend call assumes the downstream service is returning JSON.
+
 First, build the non-public instance of `gke-whereami`:
 
 ```

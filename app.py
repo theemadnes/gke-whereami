@@ -106,6 +106,7 @@ def home():
                 backend_result = None
         except:
 
+            print(sys.exc_info()[0])
             backend_result = None
 
         payload['backend_result'] = backend_result
