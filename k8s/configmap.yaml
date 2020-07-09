@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: whereami-configmap
 data:
-  BACKEND_ENABLED: "True" # flag to enable backend service call "False" || "True"
+  BACKEND_ENABLED: "False" # flag to enable backend service call "False" || "True"
   BACKEND_SERVICE: "whereami-backend" # substitute with corresponding service name - this example assumes both services are in the same namespace  
