@@ -67,7 +67,7 @@ First, build the non-public instance of `gke-whereami`:
 
 ```kubectl apply -k k8s-backend-overlay-example```
 
-Once that service is up and running, modify `k8s/configmap.yaml`'s `BACKEND_ENABLED` to `"True"`. You will have to redeploy the pods in the whereami service as they will not automatically be created when you updated the configmap.
+Once that service is up and running, modify `k8s/configmap.yaml`'s `BACKEND_ENABLED` to `"True"`. You will have to redeploy the pods in the whereami service as they will not automatically be recreated when you updated the configmap.
 
 The (slightly busy-looking) result should look like this:
 
