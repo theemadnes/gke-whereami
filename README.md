@@ -80,4 +80,6 @@ If you wish to call a different backend service, modify `k8s/configmap.yaml`'s `
 
 The operating port of this service has been switched from `5000` to `8080` to work easily with the managed version of Cloud Run.
 
+If you'd like to build & publish via Google's buildpacks, something like this should do the trick (leveraging the `Procfile`:
 
+```pack build --builder gcr.io/buildpacks/builder:v1 --publish gcr.io/#target_project#/whereami```
