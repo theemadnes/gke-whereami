@@ -1,5 +1,5 @@
 # gke-whereami
-A simple Flask app for showing what node / zone / project / cluster a given K8s pod is in. It includes an emoji that is hashed from the pod name, which makes it a little easier to visually track the pod you're dealing with.
+A simple Flask app for showing what node / zone / project / cluster a given K8s pod is in, plus stuff like the `Host` header. It includes an emoji that is hashed from the pod name, which makes it a little easier to visually track the pod you're dealing with.
 
 This has been recently modified to make use of `kustomize` for some advanced use cases. 
 
@@ -50,7 +50,7 @@ Wrap things up by `curl`ing the `EXTERNAL-IP` of the service.
 
 Result:
 
-```{"cluster_name":"acn-ips-01","node_name":"gke-acn-ips-01-default-pool-949017b6-chsz.c.alexmattson-scratch.internal","pod_ip":"10.56.1.10","pod_name":"whereami-764cb9d75c-7tccm","pod_name_emoji":"🌤","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2019-10-26T06:10:28","zone":"us-central1-f"}```
+```{"cluster_name":"ph-demo-01","host_header":"hello","node_name":"gke-ph-demo-01-default-pool-065c0ca3-611g.c.alexmattson-scratch.internal","pod_ip":"10.48.1.30","pod_name":"whereami-5595d5c98f-brd6v","pod_name_emoji":"🏄🏿","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-11T03:13:11","zone":"us-central1-c"}```
 
 
 #### using gke-whereami to call downstream services 
@@ -71,7 +71,7 @@ Once that service is up and running, modify `k8s/configmap.yaml`'s `BACKEND_ENAB
 
 The (slightly busy-looking) result should look like this:
 
-```{"backend_result":{"cluster_name":"ph-demo-01","node_name":"gke-ph-demo-01-default-pool-94e7722b-nxgb.c.alexmattson-scratch.internal","pod_ip":"10.48.0.14","pod_name":"whereami-backend-d8fcc7b5b-dtrmx","pod_name_emoji":"👐🏽","pod_namespace":"default","pod_service_account":"whereami-ksa-backend","project_id":"alexmattson-scratch","timestamp":"2020-07-09T18:36:08","zone":"us-central1-a"},"cluster_name":"ph-demo-01","node_name":"gke-ph-demo-01-default-pool-2259626e-qqxj.c.alexmattson-scratch.internal","pod_ip":"10.48.2.17","pod_name":"whereami-99fd698f6-qhl7f","pod_name_emoji":"☂","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-09T18:36:08","zone":"us-central1-f"}```
+```{"backend_result":{"cluster_name":"ph-demo-01","host_header":"hello","node_name":"gke-ph-demo-01-default-pool-94e7722b-nxgb.c.alexmattson-scratch.internal","pod_ip":"10.48.0.14","pod_name":"whereami-backend-d8fcc7b5b-dtrmx","pod_name_emoji":"👐🏽","pod_namespace":"default","pod_service_account":"whereami-ksa-backend","project_id":"alexmattson-scratch","timestamp":"2020-07-09T18:36:08","zone":"us-central1-a"},"cluster_name":"ph-demo-01","host_header":"hello","node_name":"gke-ph-demo-01-default-pool-2259626e-qqxj.c.alexmattson-scratch.internal","pod_ip":"10.48.2.17","pod_name":"whereami-99fd698f6-qhl7f","pod_name_emoji":"☂","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-09T18:36:08","zone":"us-central1-f"}```
 
 If you wish to call a different backend service, modify `k8s/configmap.yaml`'s `BACKEND_SERVICE` to some other service name. 
 

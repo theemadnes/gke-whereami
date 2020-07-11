@@ -67,6 +67,12 @@ def home():
 
         cluster_name = None
 
+    # get host header 
+    try:
+        host_header = request.headers.get('host')
+    except:
+        host_header = None
+
     # get pod name
     pod_name = socket.gethostname()
 
@@ -80,7 +86,7 @@ def home():
 
     payload = {}
     payload['cluster_name'] = cluster_name
-    #payload['emoji'] = random.choice(emoji_list)
+    payload['host_header'] = host_header
     payload['node_name'] = node_name
     payload['pod_ip'] = pod_ip
     payload['pod_name'] = pod_name
