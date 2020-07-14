@@ -5,3 +5,4 @@ metadata:
 data:
   BACKEND_ENABLED: "False" # flag to enable backend service call "False" || "True"
   BACKEND_SERVICE: "whereami-backend" # substitute with corresponding service name - this example assumes both services are in the same namespace  
+  VERSION: "1.0"

@@ -84,6 +84,9 @@ def home():
     pod_ip = os.getenv('POD_IP')
     pod_service_account = os.getenv('POD_SERVICE_ACCOUNT')
 
+    # get the whereami version envvar
+    version = os.getenv('VERSION')
+
     payload = {}
     payload['cluster_name'] = cluster_name
     payload['host_header'] = host_header
@@ -95,6 +98,7 @@ def home():
     payload['pod_service_account'] = pod_service_account
     payload['project_id'] = project_id
     payload['timestamp'] = timestamp
+    payload['version'] = version
     payload['zone'] = zone
 
     # should we call a backend service? 

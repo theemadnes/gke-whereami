@@ -17,7 +17,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/alexmattson-scratch/whereami@sha256:6638136f25b564ef00fc7521cca468e0c9ea6fcd5cfb12e9a2f110416973e7d4
+        image: gcr.io/alexmattson-scratch/whereami@sha256:668ade3d3183b789fc1bbe585cc506dd0d16cc23dddb42bbdc0fb0708b02987e
         ports:
           - name: http
             containerPort: 8080
@@ -59,3 +59,8 @@ spec:
               configMapKeyRef:
                 name: whereami-configmap
                 key: BACKEND_SERVICE
+          - name: VERSION
+            valueFrom:
+              configMapKeyRef:
+                name: whereami-configmap
+                key: VERSION
