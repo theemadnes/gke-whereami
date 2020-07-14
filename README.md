@@ -50,7 +50,7 @@ Wrap things up by `curl`ing the `EXTERNAL-IP` of the service.
 
 Result:
 
-```{"cluster_name":"ph-demo-01","host_header":"hello","node_name":"gke-ph-demo-01-default-pool-2259626e-qqxj.c.alexmattson-scratch.internal","pod_ip":"10.48.2.24","pod_name":"whereami-7566845f96-l5klw","pod_name_emoji":"💔","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-14T04:03:49","version":"1.0","zone":"us-central1-f"}```
+```{"cluster_name":"cluster-1","host_header":"34.66.118.115","node_name":"gke-cluster-1-default-pool-c91b5644-q7w5.c.alexmattson-scratch.internal","pod_ip":"10.4.0.7","pod_name":"whereami-596cb9b99-x2vz2","pod_name_emoji":"🏃🏾‍♀️","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-14T15:33:07","version":"1.0","zone":"us-central1-c"}```
 
 
 #### using gke-whereami to call downstream services 
@@ -71,7 +71,7 @@ Once that service is up and running, modify `k8s/configmap.yaml`'s `BACKEND_ENAB
 
 The (slightly busy-looking) result should look like this:
 
-```{"backend_result":{"cluster_name":"ph-demo-01","host_header":"whereami-backend","node_name":"gke-ph-demo-01-default-pool-2259626e-qqxj.c.alexmattson-scratch.internal","pod_ip":"10.48.2.22","pod_name":"whereami-backend-66c4c6855d-cgfpd","pod_name_emoji":"🧤","pod_namespace":"default","pod_service_account":"whereami-ksa-backend","project_id":"alexmattson-scratch","timestamp":"2020-07-14T04:02:04","version":"1.0","zone":"us-central1-f"},"cluster_name":"ph-demo-01","host_header":"hello","node_name":"gke-ph-demo-01-default-pool-065c0ca3-611g.c.alexmattson-scratch.internal","pod_ip":"10.48.1.32","pod_name":"whereami-7566845f96-8zrlh","pod_name_emoji":"🤰🏼","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-14T04:02:04","version":"1.0","zone":"us-central1-c"}```
+```{"backend_result":{"cluster_name":"cluster-1","host_header":"whereami-backend","node_name":"gke-cluster-1-default-pool-c91b5644-v8kg.c.alexmattson-scratch.internal","pod_ip":"10.4.2.5","pod_name":"whereami-backend-5d5f79bdf9-kknxd","pod_name_emoji":"🇺🇳","pod_namespace":"default","pod_service_account":"whereami-ksa-backend","project_id":"alexmattson-scratch","timestamp":"2020-07-14T15:33:08","version":"1.0","zone":"us-central1-c"},"cluster_name":"cluster-1","host_header":"34.66.118.115","node_name":"gke-cluster-1-default-pool-c91b5644-q7w5.c.alexmattson-scratch.internal","pod_ip":"10.4.0.7","pod_name":"whereami-596cb9b99-x2vz2","pod_name_emoji":"🏃🏾‍♀️","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-14T15:33:07","version":"1.0","zone":"us-central1-c"}```
 
 If you wish to call a different backend service, modify `k8s/configmap.yaml`'s `BACKEND_SERVICE` to some other service name. 
 
