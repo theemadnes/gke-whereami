@@ -22,7 +22,7 @@ Now create your resources:
 
 ```
 gcloud beta container clusters create $CLUSTER_NAME \
-  --cluster-version=1.17 \
+  --cluster-version=1.16 \
   --enable-ip-alias \
   --enable-stackdriver-kubernetes \
   --region=$COMPUTE_REGION \
