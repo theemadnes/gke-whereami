@@ -14,18 +14,21 @@ METADATA_URL = 'http://metadata.google.internal/computeMetadata/v1/'
 METADATA_HEADERS = {'Metadata-Flavor': 'Google'}
 
 app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False # otherwise our emojis get hosed 
-CORS(app) # enable CORS 
+app.config['JSON_AS_ASCII'] = False  # otherwise our emojis get hosed
+CORS(app)  # enable CORS
 
 # set up emoji list
 emoji_list = list(emoji.unicode_codes.UNICODE_EMOJI.keys())
+
 
 @app.route('/')
 def home():
 
     # get project ID
     try:
-        r = requests.get(METADATA_URL + 'project/project-id', headers=METADATA_HEADERS)
+        r = requests.get(METADATA_URL +
+                         'project/project-id',
+                         headers=METADATA_HEADERS)
         if r.ok:
             project_id = r.text
         else:
@@ -34,20 +37,24 @@ def home():
 
         project_id = None
 
-    # get zone 
+    # get zone
     try:
-        r = requests.get(METADATA_URL + 'instance/zone', headers=METADATA_HEADERS)
+        r = requests.get(METADATA_URL +
+                         'instance/zone',
+                         headers=METADATA_HEADERS)
         if r.ok:
             zone = str(r.text.split("/")[3])
         else:
             zone = None
     except:
 
-        zone = None 
+        zone = None
 
-    # get gke node_name 
+    # get gke node_name
     try:
-        r = requests.get(METADATA_URL + 'instance/hostname', headers=METADATA_HEADERS)
+        r = requests.get(METADATA_URL +
+                         'instance/hostname',
+                         headers=METADATA_HEADERS)
         if r.ok:
             node_name = str(r.text)
         else:
@@ -56,9 +63,11 @@ def home():
 
         node_name = None
 
-    # get cluster 
+    # get cluster
     try:
-        r = requests.get(METADATA_URL + 'instance/attributes/cluster-name', headers=METADATA_HEADERS)
+        r = requests.get(METADATA_URL +
+                         'instance/attributes/cluster-name',
+                         headers=METADATA_HEADERS)
         if r.ok:
             cluster_name = str(r.text)
         else:
@@ -67,7 +76,7 @@ def home():
 
         cluster_name = None
 
-    # get host header 
+    # get host header
     try:
         host_header = request.headers.get('host')
     except:
@@ -77,15 +86,15 @@ def home():
     pod_name = socket.gethostname()
 
     # get datetime
-    timestamp=datetime.now().replace(microsecond=0).isoformat()
+    timestamp = datetime.now().replace(microsecond=0).isoformat()
 
-    # get k8s namespace, pod ip, and pod service account 
+    # get k8s namespace, pod ip, and pod service account
     pod_namespace = os.getenv('POD_NAMESPACE')
     pod_ip = os.getenv('POD_IP')
     pod_service_account = os.getenv('POD_SERVICE_ACCOUNT')
 
-    # get the whereami version envvar
-    version = os.getenv('VERSION')
+    # get the whereami ID_STRING envvar
+    id_string = os.getenv('ID_STRING')
 
     payload = {}
     payload['cluster_name'] = cluster_name
@@ -98,10 +107,10 @@ def home():
     payload['pod_service_account'] = pod_service_account
     payload['project_id'] = project_id
     payload['timestamp'] = timestamp
-    payload['version'] = version
+    payload['id_string'] = id_string
     payload['zone'] = zone
 
-    # should we call a backend service? 
+    # should we call a backend service?
     call_backend = os.getenv('BACKEND_ENABLED')
 
     if call_backend == 'True':
@@ -121,9 +130,8 @@ def home():
 
         payload['backend_result'] = backend_result
 
-
-    #return json.dumps(payload)
     return jsonify(payload)
+
 
 @app.route('/healthz')
 def i_am_healthy():
@@ -140,5 +148,3 @@ if __name__ == '__main__':
     app.logger.handlers = []
     app.logger.propagate = True
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
-
-

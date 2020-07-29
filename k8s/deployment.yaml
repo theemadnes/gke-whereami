@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: whereami
-  #namespace: whereami
 spec:
   replicas: 3
   selector:
@@ -17,7 +16,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/alexmattson-scratch/whereami@sha256:668ade3d3183b789fc1bbe585cc506dd0d16cc23dddb42bbdc0fb0708b02987e
+        image: gcr.io/alexmattson-scratch/whereami@sha256:b592d113dff6ca1584d8f8d5a3aa2aca437e1764b2c86db061d9a7eaa3e81815
         ports:
           - name: http
             containerPort: 8080
@@ -59,8 +58,8 @@ spec:
               configMapKeyRef:
                 name: whereami-configmap
                 key: BACKEND_SERVICE
-          - name: VERSION
+          - name: ID_STRING
             valueFrom:
               configMapKeyRef:
                 name: whereami-configmap
-                key: VERSION
+                key: ID_STRING
