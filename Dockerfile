@@ -1,7 +1,6 @@
 FROM python:3.8-alpine
 
 #MAINTAINER Alex Mattson "alex.mattson@gmail.com"
-# test
 
 COPY ./requirements.txt /app/requirements.txt
 

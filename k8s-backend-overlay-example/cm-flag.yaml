@@ -4,4 +4,4 @@ metadata:
   name: whereami-configmap
 data:
   BACKEND_ENABLED: "False" # assuming you don't want a chain of backend calls
-  ID_STRING:       "backend"
+  METADATA:        "backend"

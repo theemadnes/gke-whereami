@@ -24,91 +24,87 @@ emoji_list = list(emoji.unicode_codes.UNICODE_EMOJI.keys())
 @app.route('/')
 def home():
 
-    # get project ID
+    # define the response payload
+    payload = {}
+
+    # get GCP project ID
     try:
         r = requests.get(METADATA_URL +
                          'project/project-id',
                          headers=METADATA_HEADERS)
         if r.ok:
-            project_id = r.text
-        else:
-            project_id = None
+            payload['project_id'] = r.text
     except:
 
-        project_id = None
+        logging.warning("Unable to capture project ID.")
 
-    # get zone
+    # get GCP zone
     try:
         r = requests.get(METADATA_URL +
                          'instance/zone',
                          headers=METADATA_HEADERS)
         if r.ok:
-            zone = str(r.text.split("/")[3])
-        else:
-            zone = None
+            payload['zone'] = str(r.text.split("/")[3])
     except:
 
-        zone = None
+        logging.warning("Unable to capture zone.")
 
-    # get gke node_name
+    # get GKE node name
     try:
         r = requests.get(METADATA_URL +
                          'instance/hostname',
                          headers=METADATA_HEADERS)
         if r.ok:
-            node_name = str(r.text)
-        else:
-            node_name = None
+            payload['node_name'] = str(r.text)
     except:
 
-        node_name = None
+        logging.warning("Unable to capture node name.")
 
-    # get cluster
+    # get GKE cluster name
     try:
         r = requests.get(METADATA_URL +
                          'instance/attributes/cluster-name',
                          headers=METADATA_HEADERS)
         if r.ok:
-            cluster_name = str(r.text)
-        else:
-            cluster_name = None
+            payload['cluster_name'] = str(r.text)
     except:
 
-        cluster_name = None
+        logging.warning("Unable to capture GKE cluster name.")
 
     # get host header
     try:
-        host_header = request.headers.get('host')
+        payload['host_header'] = request.headers.get('host')
     except:
-        host_header = None
+        logging.warning("Unable to capture host header.")
 
-    # get pod name
-    pod_name = socket.gethostname()
+    # get pod name, emoji & datetime
+    payload['pod_name'] = socket.gethostname()
+    payload['pod_name_emoji'] = emoji_list[hash(socket.gethostname()) %
+                                           len(emoji_list)]
+    payload['timestamp'] = datetime.now().replace(microsecond=0).isoformat()
 
-    # get datetime
-    timestamp = datetime.now().replace(microsecond=0).isoformat()
+    # get namespace, pod ip, and pod service account via downstream API
+    if os.getenv('POD_NAMESPACE'):
+        payload['pod_namespace'] = os.getenv('POD_NAMESPACE')
+    else:
+        logging.warning("Unable to capture pod namespace.")
 
-    # get k8s namespace, pod ip, and pod service account
-    pod_namespace = os.getenv('POD_NAMESPACE')
-    pod_ip = os.getenv('POD_IP')
-    pod_service_account = os.getenv('POD_SERVICE_ACCOUNT')
+    if os.getenv('POD_IP'):
+        payload['pod_ip'] = os.getenv('POD_IP')
+    else:
+        logging.warning("Unable to capture pod IP address.")
 
-    # get the whereami ID_STRING envvar
-    id_string = os.getenv('ID_STRING')
+    if os.getenv('POD_SERVICE_ACCOUNT'):
+        payload['pod_service_account'] = os.getenv('POD_SERVICE_ACCOUNT')
+    else:
+        logging.warning("Unable to capture pod KSA.")
 
-    payload = {}
-    payload['cluster_name'] = cluster_name
-    payload['host_header'] = host_header
-    payload['node_name'] = node_name
-    payload['pod_ip'] = pod_ip
-    payload['pod_name'] = pod_name
-    payload['pod_name_emoji'] = emoji_list[hash(pod_name) % len(emoji_list)]
-    payload['pod_namespace'] = pod_namespace
-    payload['pod_service_account'] = pod_service_account
-    payload['project_id'] = project_id
-    payload['timestamp'] = timestamp
-    payload['id_string'] = id_string
-    payload['zone'] = zone
+    # get the whereami METADATA envvar
+    metadata = os.getenv('METADATA')
+    if os.getenv('METADATA'):
+        payload['metadata'] = os.getenv('METADATA')
+    else:
+        logging.warning("Unable to capture metadata.")
 
     # should we call a backend service?
     call_backend = os.getenv('BACKEND_ENABLED')
@@ -133,7 +129,7 @@ def home():
     return jsonify(payload)
 
 
-@app.route('/healthz')
+@app.route('/healthz')  # healthcheck endpoint
 def i_am_healthy():
     return ('OK')
 
