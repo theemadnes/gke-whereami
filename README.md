@@ -6,7 +6,7 @@ This was originally written for testing & debugging multi-cluster ingress use ca
 
 ### Setup
 
-Create a GKE cluster 
+#### 1 - Create a GKE cluster 
 
 First define your environment variables (substituting where #needed#):
 
@@ -25,13 +25,13 @@ gcloud beta container clusters create $CLUSTER_NAME \
   --enable-ip-alias \
   --enable-stackdriver-kubernetes \
   --region=$COMPUTE_REGION \
-  --num-nodes=1 \
+  --num-nodes=2 \
   --release-channel=regular
 
 gcloud container clusters get-credentials $CLUSTER_NAME --region $COMPUTE_REGION
 ```
 
-Deploy the service/pods:
+#### 2 - Deploy the service/pods:
 
 ```kubectl apply -k k8s```
 
@@ -53,7 +53,7 @@ Result:
 ```{"cluster_name":"cluster-1","host_header":"34.72.90.134","metadata":"frontend","node_name":"gke-cluster-1-default-pool-c91b5644-v8kg.c.alexmattson-scratch.internal","pod_ip":"10.4.2.34","pod_name":"whereami-7b79956dd6-vmm9z","pod_name_emoji":"🧚🏼‍♀️","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-30T05:44:14","zone":"us-central1-c"}```
 
 
-#### using gke-whereami to call downstream services 
+#### 3 - [Optional] Use gke-whereami to call downstream services 
 
 `gke-whereami` has an optional flag within its configmap that will cause it to call another backend service within your GKE cluster (for example, a different, non-public instance of itself). This is helpful for demonstrating a public microservice call to a non-public microservice, and then including the responses of both microservices in the payload delivered back to the user.  
 
@@ -106,7 +106,7 @@ Look at the `backend_result` field from the response. That portion of the JSON i
 If you wish to call a different backend service, modify `k8s/configmap.yaml`'s `BACKEND_SERVICE` to some other service name. 
 
 
-#### Notes
+### Notes
 
 The operating port of the pod has been switched from `5000` to `8080` to work easily with the managed version of Cloud Run.
 
