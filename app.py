@@ -20,6 +20,7 @@ CORS(app)  # enable CORS
 # set up emoji list
 emoji_list = list(emoji.unicode_codes.UNICODE_EMOJI.keys())
 
+
 @app.route('/healthz')  # healthcheck endpoint
 def i_am_healthy():
     return ('OK')
