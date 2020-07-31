@@ -2,7 +2,6 @@
   kind: "Service"
   metadata:
     name: "whereami"
-    #namespace: "whereami"
   spec:
     ports:
     - port: 80
