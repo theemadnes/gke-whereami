@@ -100,7 +100,7 @@ kubectl apply -k k8s
 kustomize build k8s | kubectl apply -f -
 ```
 
-Get the service endpoint:
+Get the service endpoint (*note: this may be `pending` for a few minutes while the service provisions*):
 ```
 WHEREAMI_ENDPOINT=$(kubectl get svc whereami | grep -v EXTERNAL-IP | awk '{ print $4}')
 ```
