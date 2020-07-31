@@ -107,7 +107,9 @@ WHEREAMI_ENDPOINT=$(kubectl get svc | grep -v EXTERNAL-IP | awk '{ print $4}')
 
 Wrap things up by `curl`ing the `EXTERNAL-IP` of the service. 
 
-```curl $WHEREAMI_ENDPOINT```
+```
+curl $WHEREAMI_ENDPOINT
+```
 
 The (*slightly* busy-looking) result should look like this:
 
