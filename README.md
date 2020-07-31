@@ -35,11 +35,15 @@ This will create a regional cluster with a single node per zone (3 nodes in tota
 
 #### Step 2 - Deploy the service/pods:
 
-```kubectl apply -k k8s```
+```
+kubectl apply -k k8s
+```
 
 *or via [kustomize](https://kustomize.io/)*
 
-```kustomize build k8s | kubectl apply -f -```
+```
+kustomize build k8s | kubectl apply -f -
+```
 
 Get the service endpoint:
 ```
@@ -48,7 +52,9 @@ WHEREAMI_ENDPOINT=$(kubectl get svc | grep -v EXTERNAL-IP | awk '{ print $4}')
 
 Wrap things up by `curl`ing the `EXTERNAL-IP` of the service. 
 
-```curl $WHEREAMI_ENDPOINT```
+```
+curl $WHEREAMI_ENDPOINT
+```
 
 Result:
 
@@ -62,15 +68,21 @@ Result:
 
 First, remove the default deployment, as the default deployment won't attempt to call the downstream service, since updating a configmap referenced by a pod will not automatically redeploy that pod:
 
-```kubectl delete -k k8s```
+```
+kubectl delete -k k8s
+```
 
 #### [Optional] Step 2 - Deploy the backend instance
 
-```kubectl apply -k k8s-backend-overlay-example```
+```
+kubectl apply -k k8s-backend-overlay-example
+```
 
 *or via [kustomize](https://kustomize.io/)*
 
-```kustomize build k8s-backend-overlay-example | kubectl apply -f -```
+```
+kustomize build k8s-backend-overlay-example | kubectl apply -f -
+```
 
 #### [Optional] Step 3 - Configure & deploy the frontend
 
@@ -78,11 +90,15 @@ Modify `k8s/configmap.yaml`'s `BACKEND_ENABLED` field to `"True"`.
 
 Next, redeploy the "frontend" instance of `gke-whereami`:
 
-```kubectl apply -k k8s```
+```
+kubectl apply -k k8s
+```
 
 *or via [kustomize](https://kustomize.io/)*
 
-```kustomize build k8s | kubectl apply -f -```
+```
+kustomize build k8s | kubectl apply -f -
+```
 
 Get the service endpoint:
 ```
