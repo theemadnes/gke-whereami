@@ -89,20 +89,13 @@ Get the service endpoint:
 WHEREAMI_ENDPOINT=$(kubectl get svc | grep -v EXTERNAL-IP | awk '{ print $4}')
 ```
 
-Get the service endpoint:
-```
-WHEREAMI_ENDPOINT=$(kubectl get svc | grep -v EXTERNAL-IP | awk '{ print $4}')
-```
-
 Wrap things up by `curl`ing the `EXTERNAL-IP` of the service. 
 
 ```curl $WHEREAMI_ENDPOINT```
 
 The (*slightly* busy-looking) result should look like this:
 
-```
-{"backend_result":{"cluster_name":"cluster-1","host_header":"whereami-backend","metadata":"backend","node_name":"gke-cluster-1-default-pool-c91b5644-v8kg.c.alexmattson-scratch.internal","pod_ip":"10.4.2.37","pod_name":"whereami-backend-86bdc7b596-z4dqk","pod_name_emoji":"💪🏾","pod_namespace":"default","pod_service_account":"whereami-ksa-backend","project_id":"alexmattson-scratch","timestamp":"2020-07-30T05:56:15","zone":"us-central1-c"},"cluster_name":"cluster-1","host_header":"34.72.90.134","metadata":"frontend","node_name":"gke-cluster-1-default-pool-c91b5644-1z7l.c.alexmattson-scratch.internal","pod_ip":"10.4.1.29","pod_name":"whereami-7888579d9d-qdmbg","pod_name_emoji":"🧜","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-30T05:56:15","zone":"us-central1-c"}
-```
+```{"backend_result":{"cluster_name":"cluster-1","host_header":"whereami-backend","metadata":"backend","node_name":"gke-cluster-1-default-pool-c91b5644-v8kg.c.alexmattson-scratch.internal","pod_ip":"10.4.2.37","pod_name":"whereami-backend-86bdc7b596-z4dqk","pod_name_emoji":"💪🏾","pod_namespace":"default","pod_service_account":"whereami-ksa-backend","project_id":"alexmattson-scratch","timestamp":"2020-07-30T05:56:15","zone":"us-central1-c"},"cluster_name":"cluster-1","host_header":"34.72.90.134","metadata":"frontend","node_name":"gke-cluster-1-default-pool-c91b5644-1z7l.c.alexmattson-scratch.internal","pod_ip":"10.4.1.29","pod_name":"whereami-7888579d9d-qdmbg","pod_name_emoji":"🧜","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-30T05:56:15","zone":"us-central1-c"}```
 
 Look at the `backend_result` field from the response. That portion of the JSON is from the backend service.
 
