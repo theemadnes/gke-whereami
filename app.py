@@ -136,7 +136,13 @@ def home(path):
 
     if echo_headers == 'True':
 
-        payload['echo_headers'] = {k:v for k, v in request.headers.items()}
+        try: 
+
+            payload['headers'] = {k:v for k, v in request.headers.items()}
+
+        except:
+
+            logging.warning("Unable to capture inbound headers.")
 
     return jsonify(payload)
 

@@ -1,7 +1,5 @@
 # whereami
 
-*NOTE - this repo has been moved to https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/master/whereami*
-
 `whereami` is a simple Kubernetes-oriented python app for describing the location of the pod serving a request via its attributes (cluster name, cluster region, pod name, namespace, service account, etc). This is useful for a variety of demos where you just need to understand how traffic is getting to and returning from your app.
 
 ### Simple deployment 
@@ -9,7 +7,7 @@
 `whereami` is a single-container app, designed and packaged to run on Kubernetes. In it's simplest form it can be deployed in a single line with only a few parameters.
 
 ```bash
-$ kubectl run --image=gcr.io/alexmattson-scratch/whereami:v1.1.0 --expose --port 8080 whereami
+$ kubectl run --image=gcr.io/alexmattson-scratch/whereami:v1.0.1 --expose --port 8080 whereami
 ```
 
 The `whereami`  pod listens on port `8080` and returns a very simple JSON response that indicates who is responding and where they live.
@@ -81,7 +79,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/alexmattson-scratch/whereami:v1.1.0
+        image: gcr.io/alexmattson-scratch/whereami:v1.0.1
         ports:
           - name: http
             containerPort: 8080 #The application is listening on port 8080
@@ -286,7 +284,7 @@ $ for i in {1..3}; do curl $ENDPOINT -s | jq '{frontend: .pod_name, backend: .ba
 
 ### Include all received headers in the response  
 
-`whereami` has an additional feature flag that, when enabled, will include all received headers in its reply. If, in `k8s/configmap.yaml`, `ECHO_HEADERS` is set to `True`, the response payload will include an `echo_headers` field, populated with the headers included in the client's request. 
+`whereami` has an additional feature flag that, when enabled, will include all received headers in its reply. If, in `k8s/configmap.yaml`, `ECHO_HEADERS` is set to `True`, the response payload will include a `headers` field, populated with the headers included in the client's request. 
 
 #### Step 1 - Deploy whereami with header echoing enabled 
 
@@ -312,7 +310,7 @@ Curl the endpoint to get the response. Yet again, we use [jq]() to provide a lit
 $ curl $ENDPOINT -s | jq .
 {
   "cluster_name": "cluster-1",
-  "echo_headers": {
+  "headers": {
     "Accept": "*/*",
     "Host": "34.67.116.242",
     "User-Agent": "curl/7.64.1"
