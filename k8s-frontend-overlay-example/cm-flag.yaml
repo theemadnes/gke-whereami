@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: whereami-configmap
+data:
+  BACKEND_ENABLED: "True" 
+  BACKEND_SERVICE: "whereami-backend" # substitute with corresponding service name - this example assumes both services are in the same namespace  
+  METADATA: "frontend"

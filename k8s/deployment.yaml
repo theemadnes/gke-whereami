@@ -16,7 +16,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/alexmattson-scratch/whereami:v1.0
+        image: gcr.io/alexmattson-scratch/whereami:v1.1.0
         ports:
           - name: http
             containerPort: 8080
@@ -63,3 +63,8 @@ spec:
               configMapKeyRef:
                 name: whereami-configmap
                 key: METADATA
+          - name: ECHO_HEADERS
+            valueFrom:
+              configMapKeyRef:
+                name: whereami-configmap
+                key: ECHO_HEADERS

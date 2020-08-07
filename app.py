@@ -132,6 +132,12 @@ def home(path):
 
         payload['backend_result'] = backend_result
 
+    echo_headers = os.getenv('ECHO_HEADERS')
+
+    if echo_headers == 'True':
+
+        payload['echo_headers'] = {k:v for k, v in request.headers.items()}
+
     return jsonify(payload)
 
 

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: whereami-configmap
+data:
+  METADATA: "echo_headers_enabled"
+  ECHO_HEADERS: "True"

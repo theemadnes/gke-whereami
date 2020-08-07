@@ -6,3 +6,4 @@ data:
   BACKEND_ENABLED: "False" # flag to enable backend service call "False" || "True"
   BACKEND_SERVICE: "whereami-backend" # substitute with corresponding service name - this example assumes both services are in the same namespace  
   METADATA:        "frontend" # arbitrary string that gets returned in payload - can be used to track which services you're interacting with 
+  ECHO_HEADERS:    "False" # flag to enable the payload including all headers received in the `echo_headers` field if set to "True"
