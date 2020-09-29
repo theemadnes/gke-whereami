@@ -1,6 +1,6 @@
-nameSuffix: "-frontend"
+nameSuffix: "-echo-headers"
 commonLabels:
-  app: whereami-frontend
+  app: whereami-headers
 bases:
 - ../k8s
 patches:

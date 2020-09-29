@@ -7,7 +7,7 @@
 `whereami` is a single-container app, designed and packaged to run on Kubernetes. In it's simplest form it can be deployed in a single line with only a few parameters.
 
 ```bash
-$ kubectl run --image=gcr.io/alexmattson-scratch/whereami:v1.0.1 --expose --port 8080 whereami
+$ kubectl run --image=gcr.io/google-samples/whereami:v1.0.1 --expose --port 8080 whereami
 ```
 
 The `whereami`  pod listens on port `8080` and returns a very simple JSON response that indicates who is responding and where they live.
@@ -79,7 +79,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/alexmattson-scratch/whereami:v1.0.1
+        image: gcr.io/google-samples/whereami:v1.0.1
         ports:
           - name: http
             containerPort: 8080 #The application is listening on port 8080
@@ -301,7 +301,7 @@ deployment.apps/whereami-frontend created
 Get the external Service endpoint again:
 
 ```bash
-$ ENDPOINT=$(kubectl get svc whereami-frontend | grep -v EXTERNAL-IP | awk '{ print $4}')
+$ ENDPOINT=$(kubectl get svc whereami-echo-headers | grep -v EXTERNAL-IP | awk '{ print $4}')
 ```
 
 Curl the endpoint to get the response. Yet again, we use [jq]() to provide a little more structure to the response:
@@ -312,19 +312,19 @@ $ curl $ENDPOINT -s | jq .
   "cluster_name": "cluster-1",
   "headers": {
     "Accept": "*/*",
-    "Host": "34.67.116.242",
+    "Host": "35.202.174.251",
     "User-Agent": "curl/7.64.1"
   },
-  "host_header": "34.67.116.242",
-  "metadata": "echo_headers",
-  "node_name": "gke-cluster-1-default-pool-c91b5644-v8kg.c.alexmattson-scratch.internal",
-  "pod_ip": "10.4.2.45",
-  "pod_name": "whereami-frontend-98d865569-bjj4m",
-  "pod_name_emoji": "💂🏻‍♀️",
+  "host_header": "35.202.174.251",
+  "metadata": "echo_headers_enabled",
+  "node_name": "gke-cluster-1-default-pool-c91b5644-1z7l.c.alexmattson-scratch.internal",
+  "pod_ip": "10.4.1.44",
+  "pod_name": "whereami-echo-headers-78766fb94f-ggmcb",
+  "pod_name_emoji": "🧑🏿",
   "pod_namespace": "default",
-  "pod_service_account": "whereami-ksa-frontend",
+  "pod_service_account": "whereami-ksa-echo-headers",
   "project_id": "alexmattson-scratch",
-  "timestamp": "2020-08-07T04:15:34",
+  "timestamp": "2020-08-11T18:21:58",
   "zone": "us-central1-c"
 }
 ```
