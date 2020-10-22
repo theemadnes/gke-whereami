@@ -107,3 +107,5 @@ lib/
 include/
 bin/
 pyvenv.cfg
+.DS_Store
+.gitignore

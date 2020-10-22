@@ -1,40 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: whereami
+  name: whereami-grpc
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: whereami
+      app: whereami-grpc
   template:
     metadata:
       labels:
-        app: whereami
+        app: whereami-grpc
         version: v1
     spec:
-      serviceAccountName: whereami-ksa
+      serviceAccountName: whereami-grpc-ksa
       containers:
-      - name: whereami
+      - name: whereami-grpc
         image: gcr.io/google-samples/whereami:v1.1.0
         ports:
-          - name: http
-            containerPort: 8080
-        livenessProbe:
-          httpGet:
-              path: /healthz
-              port: 8080
-              scheme: HTTP
-          initialDelaySeconds: 5
-          periodSeconds: 15
-          timeoutSeconds: 5
+          - name: grpc
+            containerPort: 9090
         readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-            scheme: HTTP
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:9090"]
           initialDelaySeconds: 5
-          timeoutSeconds: 1
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:9090"]
+          initialDelaySeconds: 10
         env:
           - name: POD_NAMESPACE
             valueFrom:
@@ -51,25 +44,25 @@ spec:
           - name: BACKEND_ENABLED
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami-grpc-configmap
                 key: BACKEND_ENABLED
           - name: BACKEND_SERVICE
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami-grpc-configmap
                 key: BACKEND_SERVICE
           - name: METADATA
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami-grpc-configmap
                 key: METADATA
           - name: ECHO_HEADERS
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami-grpc-configmap
                 key: ECHO_HEADERS
           - name: GRPC_ENABLED
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami-grpc-configmap
                 key: GRPC_ENABLED

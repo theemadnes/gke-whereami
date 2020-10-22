@@ -2,3 +2,6 @@ flask
 requests
 emoji
 flask-cors
+grpcio
+grpcio-reflection
+grpcio-health-checking

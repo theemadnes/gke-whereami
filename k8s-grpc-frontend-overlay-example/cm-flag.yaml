@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: whereami-grpc-configmap
+data:
+  BACKEND_ENABLED: "True" 
+  BACKEND_SERVICE: "whereami-grpc-backend" # substitute with corresponding service name - this example assumes both services are in the same namespace  
+  METADATA: "grpc-frontend"
+  GRPC_ENABLED: "True"

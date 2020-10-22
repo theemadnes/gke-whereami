@@ -1,6 +1,8 @@
 # whereami
 
-`whereami` is a simple Kubernetes-oriented python app for describing the location of the pod serving a request via its attributes (cluster name, cluster region, pod name, namespace, service account, etc). This is useful for a variety of demos where you just need to understand how traffic is getting to and returning from your app.
+`whereami` is a simple Kubernetes-oriented python app for describing the location of the pod serving a request via its attributes (cluster name, cluster region, pod name, namespace, service account, etc). This is useful for a variety of demos where you just need to understand how traffic is getting to and returning from your app. 
+
+`whereami`, by default, is a Flask-based python app. It also can operate as a [gRPC](https://grpc.io/) server. The instructions for using gRPC are at the bottom of this document.
 
 ### Simple deployment 
 
@@ -239,7 +241,7 @@ Get the external Service endpoint again:
 $ ENDPOINT=$(kubectl get svc whereami-frontend | grep -v EXTERNAL-IP | awk '{ print $4}')
 ```
 
-Curl the endpoint to get the response. In this example we use [jq]() to provide a little more structure to the response:
+Curl the endpoint to get the response. In this example we use [jq](https://stedolan.github.io/jq/) to provide a little more structure to the response:
 
 ```bash
 $ curl $ENDPOINT -s | jq .
@@ -304,7 +306,7 @@ Get the external Service endpoint again:
 $ ENDPOINT=$(kubectl get svc whereami-echo-headers | grep -v EXTERNAL-IP | awk '{ print $4}')
 ```
 
-Curl the endpoint to get the response. Yet again, we use [jq]() to provide a little more structure to the response:
+Curl the endpoint to get the response. Yet again, we use [jq](https://stedolan.github.io/jq/) to provide a little more structure to the response:
 
 ```bash
 $ curl $ENDPOINT -s | jq .
@@ -329,11 +331,97 @@ $ curl $ENDPOINT -s | jq .
 }
 ```
 
+### gRPC support
+
+By enabling a feature flag in the `whereami` configmap, `whereami` can be interacted with using [gRPC](https://grpc.io/), with support for the gRPC [health check protocol](https://github.com/grpc/grpc/blob/master/doc/health-checking.md). The examples below leverage [grpcurl](https://github.com/fullstorydev/grpcurl), and assume you've already deployed a GKE cluster.
+
+> Note: because gRPC is used as the protocol, the output of `whereami-grpc`, when using gRPC, will omit any `header` fields *and* the service listens on port `9090`
+
+#### Step 1 - Deploy the whereami-grpc backend
+
+Deploy the `whereami-grpc` backend using the manifests from [k8s-grpc-backend-overlay-example](k8s-grpc-backend-overlay-example):
+
+```bash
+$ kubectl apply -k k8s-grpc-backend-overlay-example
+serviceaccount/whereami-grpc-ksa-backend created
+configmap/whereami-grpc-configmap-backend created
+service/whereami-grpc-backend created
+deployment.apps/whereami-grpc-backend created
+```
+
+#### Step 2 - Deploy the whereami-grpc frontend
+
+Now we're going to deploy the `whereami-grpc` frontend from the [k8s-grpc-frontend-overlay-example](k8s-grpc-frontend-overlay-example):
+
+```bash
+$ kubectl apply -k k8s-grpc-frontend-overlay-example
+serviceaccount/whereami-grpc-ksa-frontend created
+configmap/whereami-grpc-configmap-frontend created
+service/whereami-grpc-frontend created
+deployment.apps/whereami-grpc-frontend created
+```
+
+#### Step 3 - Query whereami-grpc frontend
+
+Get the external Service gRPC endpoint:
+
+```bash
+$ ENDPOINT=$(kubectl get svc whereami-grpc-frontend | grep -v EXTERNAL-IP | awk '{ print $4}')
+```
+
+Call the endpoint (using [grpcurl](https://github.com/fullstorydev/grpcurl)) to get the response. In this example we use [jq](https://stedolan.github.io/jq/) to provide a little more structure to the response:
+
+```bash
+$ grpcurl -plaintext $ENDPOINT:9090 whereami.Whereami.GetPayload | jq .
+{
+  "backend_result": {
+    "clusterName": "asm-test-01",
+    "metadata": "grpc-backend",
+    "nodeName": "gke-asm-test-01-default-pool-02e1ecfb-1b9z.c.alexmattson-scratch.internal",
+    "podIp": "10.76.0.10",
+    "podName": "whereami-grpc-backend-f9b79888d-mcbxv",
+    "podNameEmoji": "🤒",
+    "podNamespace": "default",
+    "podServiceAccount": "whereami-grpc-ksa-backend",
+    "projectId": "alexmattson-scratch",
+    "timestamp": "2020-10-22T05:10:58",
+    "zone": "us-central1-c"
+  },
+  "cluster_name": "asm-test-01",
+  "metadata": "grpc-frontend",
+  "node_name": "gke-asm-test-01-default-pool-f9ad78c0-w3qr.c.alexmattson-scratch.internal",
+  "pod_ip": "10.76.1.10",
+  "pod_name": "whereami-grpc-frontend-88b54bc6-9w8cc",
+  "pod_name_emoji": "🇸🇦",
+  "pod_namespace": "default",
+  "pod_service_account": "whereami-grpc-ksa-frontend",
+  "project_id": "alexmattson-scratch",
+  "timestamp": "2020-10-22T05:10:58",
+  "zone": "us-central1-f"
+}
+```
 
 ### Notes
 
-If you'd like to build & publish via Google's [buildpacks](https://github.com/GoogleCloudPlatform/buildpacks), something like this should do the trick (leveraging the local `Procfile`):
+If you'd like to build & publish via Google's [buildpacks](https://github.com/GoogleCloudPlatform/buildpacks), something like this should do the trick (leveraging the local `Procfile`) from this directory:
 
-```pack build --builder gcr.io/buildpacks/builder:v1 --publish gcr.io/${PROJECT_ID}/whereami```
+```
+cat > run.Dockerfile << EOF
+FROM gcr.io/buildpacks/gcp/run:v1
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  wget && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/* && \
+  wget -O /bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.3/grpc_health_probe-linux-amd64 && \ 
+  chmod +x /bin/grpc_health_probe
+USER cnb
+EOF
+
+docker build -t gcr.io/${PROJECT_ID}/whereami-run-image -f run.Dockerfile .
+docker push gcr.io/${PROJECT_ID}/whereami-run-image
+```
+
+```pack build --builder gcr.io/buildpacks/builder:v1 --publish gcr.io/${PROJECT_ID}/whereami --run-image gcr.io/${PROJECT_ID}/whereami-run-image```
 
 

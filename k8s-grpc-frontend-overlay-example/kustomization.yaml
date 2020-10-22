@@ -1,0 +1,7 @@
+nameSuffix: "-frontend"
+commonLabels:
+  app: whereami-grpc-frontend
+bases:
+- ../k8s-grpc
+patches:
+- cm-flag.yaml
