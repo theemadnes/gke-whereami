@@ -278,7 +278,7 @@ $ curl $ENDPOINT -s | jq .
 This response shows the chain of communications with the response from the frontend and the response from the backend. A little bit of jq-magic can actually make it easy too see the chains of communications over successive requests:
 
 ```bash
-$ for i in {1..3}; do curl $ENDPOINT -s | jq '{frontend: .pod_name, backend: .backend_result.pod_name}' -c; done
+$ for i in {1..3}; do curl $ENDPOINT -s | jq '{frontend: .pod_name_emoji, backend: .backend_result.pod_name_emoji}' -c; done
 {"frontend":"🏃🏻‍♀️","backend":"5️⃣"}
 {"frontend":"🤦🏾","backend":"🤦🏾‍♀️"}
 {"frontend":"🏃🏻‍♀️","backend":"🏀"}
@@ -335,9 +335,11 @@ $ curl $ENDPOINT -s | jq .
 
 All of the prior examples for `whereami` are based on its default operating mode of using [Flask](https://flask.palletsprojects.com/en/1.1.x/) as its server. The following section details how `whereami` can be configured to use [gRPC](https://grpc.io/) instead.
 
-By enabling a feature flag in the `whereami` configmap (see [here](k8s-grpc/configmap.yaml), [here](k8s-grpc/deployment.yaml) and [here](k8s-grpc/service.yaml)), `whereami` can be interacted with using [gRPC](https://grpc.io/), with support for the gRPC [health check protocol](https://github.com/grpc/grpc/blob/master/doc/health-checking.md). The examples below leverage [grpcurl](https://github.com/fullstorydev/grpcurl), and assume you've already deployed a GKE cluster.
+By setting the feature flag `GRPC_ENABLED` in the `whereami` configmap (see [here](k8s-grpc/configmap.yaml) to `"True"`, `whereami` can be interacted with using [gRPC](https://grpc.io/), with support for the gRPC [health check protocol](https://github.com/grpc/grpc/blob/master/doc/health-checking.md). The examples below leverage [grpcurl](https://github.com/fullstorydev/grpcurl), and assume you've already deployed a GKE cluster.
 
-> Note: because gRPC is used as the protocol, the `whereami-grpc` reponse will omit any `header` fields *and* listens on port `9090` instead of port `8080`
+If gRPC is enabled for a given pod, that `whereami` pod will not respond to HTTP requests, and any downstream service calls that the pod makes will also use gRPC only.
+
+> Note: because gRPC is used as the protocol, the `whereami-grpc` response will omit any `header` fields *and* listens on port `9090` instead of port `8080`.
 
 #### Step 1 - Deploy the whereami-grpc backend
 
@@ -351,6 +353,8 @@ service/whereami-grpc-backend created
 deployment.apps/whereami-grpc-backend created
 ```
 
+This backend will listen for gRPC requests from the frontend service deployed in the following step. 
+
 #### Step 2 - Deploy the whereami-grpc frontend
 
 Now we're going to deploy the `whereami-grpc` frontend from the [k8s-grpc-frontend-overlay-example](k8s-grpc-frontend-overlay-example):
@@ -362,6 +366,8 @@ configmap/whereami-grpc-configmap-frontend created
 service/whereami-grpc-frontend created
 deployment.apps/whereami-grpc-frontend created
 ```
+
+This frontend will both listen for gRPC requests from the user (described in the following step), and will make gRPC requests to the backend deployed in the prior step. 
 
 #### Step 3 - Query whereami-grpc frontend
 
