@@ -9,7 +9,6 @@ import requests
 import grpc
 import whereami_pb2
 import whereami_pb2_grpc
-from google.protobuf.json_format import MessageToDict
 
 METADATA_URL = 'http://metadata.google.internal/computeMetadata/v1/'
 METADATA_HEADERS = {'Metadata-Flavor': 'Google'}
@@ -114,8 +113,8 @@ class WhereamiPayload(object):
                 try:
                     channel = grpc.insecure_channel(backend_service + ':9090')
                     stub = whereami_pb2_grpc.WhereamiStub(channel)
-                    tmp = stub.GetPayload(whereami_pb2.Empty())
-                    self.payload['backend_result'] = MessageToDict(tmp)
+                    self.payload['backend_result'] = stub.GetPayload(
+                        whereami_pb2.Empty())
 
                 except:
                     logging.warning("Unable to capture backend result.")

@@ -18,7 +18,7 @@ message Empty {
 // The response message containing the metadata
 // Removed any of the 'header' content since we're using gRPC
 message WhereamiReply {
-    map<string, string> backend_result = 1;
+    WhereamiReply backend_result = 1;
     string cluster_name = 2;
     string metadata = 3;
     string node_name = 4;

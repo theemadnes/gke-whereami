@@ -9,7 +9,7 @@
 `whereami` is a single-container app, designed and packaged to run on Kubernetes. In it's simplest form it can be deployed in a single line with only a few parameters.
 
 ```bash
-$ kubectl run --image=gcr.io/google-samples/whereami:v1.0.1 --expose --port 8080 whereami
+$ kubectl run --image=gcr.io/google-samples/whereami:v1.1.1 --expose --port 8080 whereami
 ```
 
 The `whereami`  pod listens on port `8080` and returns a very simple JSON response that indicates who is responding and where they live.
@@ -81,7 +81,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/google-samples/whereami:v1.0.1
+        image: gcr.io/google-samples/whereami:v1.1.1
         ports:
           - name: http
             containerPort: 8080 #The application is listening on port 8080

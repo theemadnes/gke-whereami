@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0ewhereami.proto\x12\x08whereami\"\x07\n\x05\x45mpty\"\xe7\x02\n\rWhereamiReply\x12\x42\n\x0e\x62\x61\x63kend_result\x18\x01 \x03(\x0b\x32*.whereami.WhereamiReply.BackendResultEntry\x12\x14\n\x0c\x63luster_name\x18\x02 \x01(\t\x12\x10\n\x08metadata\x18\x03 \x01(\t\x12\x11\n\tnode_name\x18\x04 \x01(\t\x12\x0e\n\x06pod_ip\x18\x05 \x01(\t\x12\x10\n\x08pod_name\x18\x06 \x01(\t\x12\x16\n\x0epod_name_emoji\x18\x07 \x01(\t\x12\x15\n\rpod_namespace\x18\x08 \x01(\t\x12\x1b\n\x13pod_service_account\x18\t \x01(\t\x12\x12\n\nproject_id\x18\n \x01(\t\x12\x11\n\ttimestamp\x18\x0b \x01(\t\x12\x0c\n\x04zone\x18\x0c \x01(\t\x1a\x34\n\x12\x42\x61\x63kendResultEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32\x44\n\x08Whereami\x12\x38\n\nGetPayload\x12\x0f.whereami.Empty\x1a\x17.whereami.WhereamiReply\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x0ewhereami.proto\x12\x08whereami\"\x07\n\x05\x45mpty\"\x9e\x02\n\rWhereamiReply\x12/\n\x0e\x62\x61\x63kend_result\x18\x01 \x01(\x0b\x32\x17.whereami.WhereamiReply\x12\x14\n\x0c\x63luster_name\x18\x02 \x01(\t\x12\x10\n\x08metadata\x18\x03 \x01(\t\x12\x11\n\tnode_name\x18\x04 \x01(\t\x12\x0e\n\x06pod_ip\x18\x05 \x01(\t\x12\x10\n\x08pod_name\x18\x06 \x01(\t\x12\x16\n\x0epod_name_emoji\x18\x07 \x01(\t\x12\x15\n\rpod_namespace\x18\x08 \x01(\t\x12\x1b\n\x13pod_service_account\x18\t \x01(\t\x12\x12\n\nproject_id\x18\n \x01(\t\x12\x11\n\ttimestamp\x18\x0b \x01(\t\x12\x0c\n\x04zone\x18\x0c \x01(\t2D\n\x08Whereami\x12\x38\n\nGetPayload\x12\x0f.whereami.Empty\x1a\x17.whereami.WhereamiReply\"\x00\x62\x06proto3'
 )
 
 
@@ -50,44 +50,6 @@ _EMPTY = _descriptor.Descriptor(
 )
 
 
-_WHEREAMIREPLY_BACKENDRESULTENTRY = _descriptor.Descriptor(
-  name='BackendResultEntry',
-  full_name='whereami.WhereamiReply.BackendResultEntry',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='key', full_name='whereami.WhereamiReply.BackendResultEntry.key', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='value', full_name='whereami.WhereamiReply.BackendResultEntry.value', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=b'8\001',
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=345,
-  serialized_end=397,
-)
-
 _WHEREAMIREPLY = _descriptor.Descriptor(
   name='WhereamiReply',
   full_name='whereami.WhereamiReply',
@@ -98,8 +60,8 @@ _WHEREAMIREPLY = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='backend_result', full_name='whereami.WhereamiReply.backend_result', index=0,
-      number=1, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -183,7 +145,7 @@ _WHEREAMIREPLY = _descriptor.Descriptor(
   ],
   extensions=[
   ],
-  nested_types=[_WHEREAMIREPLY_BACKENDRESULTENTRY, ],
+  nested_types=[],
   enum_types=[
   ],
   serialized_options=None,
@@ -193,11 +155,10 @@ _WHEREAMIREPLY = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=38,
-  serialized_end=397,
+  serialized_end=324,
 )
 
-_WHEREAMIREPLY_BACKENDRESULTENTRY.containing_type = _WHEREAMIREPLY
-_WHEREAMIREPLY.fields_by_name['backend_result'].message_type = _WHEREAMIREPLY_BACKENDRESULTENTRY
+_WHEREAMIREPLY.fields_by_name['backend_result'].message_type = _WHEREAMIREPLY
 DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
 DESCRIPTOR.message_types_by_name['WhereamiReply'] = _WHEREAMIREPLY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -210,22 +171,13 @@ Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), {
 _sym_db.RegisterMessage(Empty)
 
 WhereamiReply = _reflection.GeneratedProtocolMessageType('WhereamiReply', (_message.Message,), {
-
-  'BackendResultEntry' : _reflection.GeneratedProtocolMessageType('BackendResultEntry', (_message.Message,), {
-    'DESCRIPTOR' : _WHEREAMIREPLY_BACKENDRESULTENTRY,
-    '__module__' : 'whereami_pb2'
-    # @@protoc_insertion_point(class_scope:whereami.WhereamiReply.BackendResultEntry)
-    })
-  ,
   'DESCRIPTOR' : _WHEREAMIREPLY,
   '__module__' : 'whereami_pb2'
   # @@protoc_insertion_point(class_scope:whereami.WhereamiReply)
   })
 _sym_db.RegisterMessage(WhereamiReply)
-_sym_db.RegisterMessage(WhereamiReply.BackendResultEntry)
 
 
-_WHEREAMIREPLY_BACKENDRESULTENTRY._options = None
 
 _WHEREAMI = _descriptor.ServiceDescriptor(
   name='Whereami',
@@ -234,8 +186,8 @@ _WHEREAMI = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=399,
-  serialized_end=467,
+  serialized_start=326,
+  serialized_end=394,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetPayload',
