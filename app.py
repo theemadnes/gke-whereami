@@ -38,8 +38,10 @@ class WhereamigRPC(whereami_pb2_grpc.WhereamiServicer):
 # see https://github.com/grpc/grpc/blob/master/examples/python/xds/server.py
 # for reference on code below
 def grpc_serve():
+    # the +5 you see below re: max_workers is a hack to avoid thread starvation
+    # working on a proper workaround
     server = grpc.server(
-        futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()))
+        futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()+5))
 
     # Add the application servicer to the server.
     whereami_pb2_grpc.add_WhereamiServicer_to_server(WhereamigRPC(), server)
@@ -96,6 +98,7 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logging.INFO)
     app.logger.handlers = []
     app.logger.propagate = True
+    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
     # decision point - HTTP or gRPC?
     if os.getenv('GRPC_ENABLED') == "True":

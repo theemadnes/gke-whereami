@@ -9,14 +9,27 @@
 `whereami` is a single-container app, designed and packaged to run on Kubernetes. In it's simplest form it can be deployed in a single line with only a few parameters.
 
 ```bash
-$ kubectl run --image=gcr.io/google-samples/whereami:v1.1.1 --expose --port 8080 whereami
+$ kubectl run --image=gcr.io/google-samples/whereami:v1.1.3 --expose --port 8080 whereami
 ```
 
-The `whereami`  pod listens on port `8080` and returns a very simple JSON response that indicates who is responding and where they live.
+The `whereami`  pod listens on port `8080` and returns a very simple JSON response that indicates who is responding and where they live. This example assumes you're executing the `curl` command from a pod in the same K8s cluster & namespace (although the following examples show how to access from external clients):
 
 ```bash
 $ curl 10.12.0.4:8080
-{"cluster_name":"gke-us-east","host_header":"10.12.0.4:8080","node_name":"gke-gke-us-east-default-pool-96ad63bd-5bhj.c.church-243723.internal","pod_name":"whereami-8559dc65f9-cckpc","pod_name_emoji":"👸🏽","project_id":"church-243723","timestamp":"2020-08-02T22:24:04","zone":"us-east4-a"}
+{
+  "cluster_name": "cfs-limit-test-01", 
+  "host_header": "35.232.28.77", 
+  "metadata": "frontend", 
+  "node_name": "gke-cfs-limit-test-01-default-pool-1b913ea3-poei.c.alexmattson-scratch.internal", 
+  "pod_ip": "10.32.0.24", 
+  "pod_name": "whereami-6f5545f49c-8thlp", 
+  "pod_name_emoji": "👱🏼", 
+  "pod_namespace": "default", 
+  "pod_service_account": "whereami-ksa", 
+  "project_id": "alexmattson-scratch", 
+  "timestamp": "2020-12-13T05:49:40", 
+  "zone": "us-central1-b"
+}
 ```
 
 Some of the returned metadata includes:
@@ -81,7 +94,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/google-samples/whereami:v1.1.1
+        image: gcr.io/google-samples/whereami:v1.1.3
         ports:
           - name: http
             containerPort: 8080 #The application is listening on port 8080
@@ -162,7 +175,20 @@ Wrap things up by `curl`ing the `EXTERNAL-IP` of the service.
 ```bash
 $ curl $ENDPOINT
 
-{"cluster_name":"cluster-1","host_header":"34.72.90.134","metadata":"frontend","node_name":"gke-cluster-1-default-pool-c91b5644-v8kg.c.alexmattson-scratch.internal","pod_ip":"10.4.2.34","pod_name":"whereami-7b79956dd6-vmm9z","pod_name_emoji":"🧚🏼‍♀️","pod_namespace":"default","pod_service_account":"whereami-ksa","project_id":"alexmattson-scratch","timestamp":"2020-07-30T05:44:14","zone":"us-central1-c"}
+{
+  "cluster_name": "cfs-limit-test-01", 
+  "host_header": "35.232.28.77", 
+  "metadata": "frontend", 
+  "node_name": "gke-cfs-limit-test-01-default-pool-7b7ebe33-lj4q.c.alexmattson-scratch.internal", 
+  "pod_ip": "10.32.2.23", 
+  "pod_name": "whereami-6f5545f49c-nkjdg", 
+  "pod_name_emoji": "👊", 
+  "pod_namespace": "default", 
+  "pod_service_account": "whereami-ksa", 
+  "project_id": "alexmattson-scratch", 
+  "timestamp": "2020-12-13T05:44:47", 
+  "zone": "us-central1-c"
+}
 ```
 
 
