@@ -86,6 +86,12 @@ def home(path):
 
     payload = whereami_payload.build_payload(request.headers)
 
+    # split the path to see if user wants to read a specific field
+    requested_value = path.split('/')[-1]
+    if requested_value in payload.keys():
+
+        return payload[requested_value]
+
     return jsonify(payload)
 
 if __name__ == '__main__':

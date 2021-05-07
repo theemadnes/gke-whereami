@@ -14,7 +14,7 @@ METADATA_URL = 'http://metadata.google.internal/computeMetadata/v1/'
 METADATA_HEADERS = {'Metadata-Flavor': 'Google'}
 
 # set up emoji list
-emoji_list = list(emoji.unicode_codes.UNICODE_EMOJI.keys())
+emoji_list = list(emoji.unicode_codes.UNICODE_EMOJI['en'].keys())
 
 
 class WhereamiPayload(object):
@@ -24,6 +24,28 @@ class WhereamiPayload(object):
         self.payload = {}
 
     def build_payload(self, request_headers):
+
+        # header propagation for HTTP calls to downstream services
+        def getForwardHeaders(request_headers):
+            headers = {}
+            incoming_headers = ['x-request-id',
+                                'x-b3-traceid',
+                                'x-b3-spanid',
+                                'x-b3-parentspanid',
+                                'x-b3-sampled',
+                                'x-b3-flags',
+                                'x-ot-span-context',
+                                'x-cloud-trace-context',
+                                'traceparent',
+                                'grpc-trace-bin'
+                                ]
+
+            for ihdr in incoming_headers:
+                val = request_headers.get(ihdr)
+                if val is not None:
+                    headers[ihdr] = val
+
+            return headers
 
         # get GCP project ID
         try:
@@ -122,7 +144,8 @@ class WhereamiPayload(object):
             else:
 
                 try:
-                    r = requests.get('http://' + backend_service)
+                    r = requests.get(backend_service,
+                                     headers=getForwardHeaders(request_headers))
                     if r.ok:
                         backend_result = r.json()
                     else:

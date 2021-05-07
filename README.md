@@ -1,15 +1,17 @@
 # whereami
 
-`whereami` is a simple Kubernetes-oriented python app for describing the location of the pod serving a request via its attributes (cluster name, cluster region, pod name, namespace, service account, etc). This is useful for a variety of demos where you just need to understand how traffic is getting to and returning from your app. 
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/kubernetes-engine-samples&cloudshell_tutorial=README.md&cloudshell_workspace=whereami/)
+
+`whereami` is a simple Kubernetes-oriented python app for describing the location of the pod serving a request via its attributes (cluster name, cluster region, pod name, namespace, service account, etc). This is useful for a variety of demos where you just need to understand how traffic is getting to and returning from your app.
 
 `whereami`, by default, is a Flask-based python app. It also can operate as a [gRPC](https://grpc.io/) server. The instructions for using gRPC are at the bottom of this document [here](#gRPC-support).
 
-### Simple deployment 
+### Simple deployment
 
 `whereami` is a single-container app, designed and packaged to run on Kubernetes. In it's simplest form it can be deployed in a single line with only a few parameters.
 
 ```bash
-$ kubectl run --image=gcr.io/google-samples/whereami:v1.1.3 --expose --port 8080 whereami
+$ kubectl run --image=gcr.io/google-samples/whereami:v1.2.1 --expose --port 8080 whereami
 ```
 
 The `whereami`  pod listens on port `8080` and returns a very simple JSON response that indicates who is responding and where they live. This example assumes you're executing the `curl` command from a pod in the same K8s cluster & namespace (although the following examples show how to access from external clients):
@@ -47,7 +49,7 @@ $ git clone https://github.com/GoogleCloudPlatform/kubernetes-engine-samples
 $ cd kubernetes-engine-samples/whereami
 ```
 
-#### Step 1 - Create a GKE cluster 
+#### Step 1 - Create a GKE cluster
 
 First define your environment variables (substituting where #needed#):
 
@@ -70,7 +72,7 @@ $ gcloud beta container clusters create $CLUSTER_NAME \
 $ gcloud container clusters get-credentials $CLUSTER_NAME --region $COMPUTE_REGION
 ```
 
-This will create a regional cluster with a single node per zone (3 nodes in total). 
+This will create a regional cluster with a single node per zone (3 nodes in total).
 
 #### Step 2 - Deploy whereami
 
@@ -94,7 +96,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/google-samples/whereami:v1.1.3
+        image: gcr.io/google-samples/whereami:v1.2.1
         ports:
           - name: http
             containerPort: 8080 #The application is listening on port 8080
@@ -126,7 +128,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.serviceAccountName
-          - name: BACKEND_ENABLED #If true, enables queries from whereami to a specified Service name or IP. Requires BACKEND_SERVICE to be set. 
+          - name: BACKEND_ENABLED #If true, enables queries from whereami to a specified Service name or IP. Requires BACKEND_SERVICE to be set.
             valueFrom:
               configMapKeyRef:
                 name: whereami-configmap
@@ -170,7 +172,7 @@ ENDPOINT=$(kubectl get svc whereami | grep -v EXTERNAL-IP | awk '{ print $4}')
 
 > Note: this may be `pending` for a few minutes while the service provisions
 
-Wrap things up by `curl`ing the `EXTERNAL-IP` of the service. 
+Wrap things up by `curl`ing the `EXTERNAL-IP` of the service.
 
 ```bash
 $ curl $ENDPOINT
@@ -191,11 +193,31 @@ $ curl $ENDPOINT
 }
 ```
 
+The JSON payload example above covers the majority of fields that `whereami` can return. In the following sections, you will see how it's possible to have `whereami` to call downstream services, adding additional data to that payload. Before you do that, it's worth pointing out that `whereami` can also return individual fields from that JSON payload as plaintext, so long as you include the field's name as a suffix to the path you're calling. Let's see an example.
+
+Suppose you only care about the `pod_name_emoji` value. You can do the following to capture only that value in the response:
+
+```bash
+$ curl $ENDPOINT/some/path/prefix/pod_name_emoji
+
+🧚🏽
+```
+
+`whereami` will evaluate the path you're accessing, and as long as the last part of the path matches a valid field name of the JSON response, it will return that value. Otherwise, you'll get the full JSON response. 
+
+The fields/path suffixes that are *always* available in a HTTP `whereami` response are:
+
+- `host_header`
+- `pod_name`
+- `pod_name_emoji`
+- `timestamp`
 
 
 ### Setup a backend service call
 
 `whereami` has an optional flag within its configmap that will cause it to call another backend service within your Kubernetes cluster (for example, a different, non-public instance of itself). This is helpful for demonstrating a public microservice call to a non-public microservice, and then including the responses of both microservices in the payload delivered back to the user.
+
+> Note: when defining a backend service to call via HTTP, make sure the `BACKEND_SERVICE` endpoint indicates either an `http://` or `https://` prefix.
 
 #### Step 1 - Deploy the whereami backend
 
@@ -245,7 +267,8 @@ metadata:
   name: whereami-configmap
 data:
   BACKEND_ENABLED: "True" #This enables requests to be send to the backend
-  BACKEND_SERVICE: "whereami-backend" #This is the name of the backend Service that was created in the previous step
+  # when defining the BACKEND_SERVICE using an HTTP protocol, indicate HTTP or HTTPS; if using gRPC, use the host name only
+  BACKEND_SERVICE: "http://whereami-backend" #This is the name of the backend Service that was created in the previous step
   METADATA:        "frontend" #This is the metadata string returned in the output
 ```
 
@@ -310,11 +333,11 @@ $ for i in {1..3}; do curl $ENDPOINT -s | jq '{frontend: .pod_name_emoji, backen
 {"frontend":"🏃🏻‍♀️","backend":"🏀"}
 ```
 
-### Include all received headers in the response  
+### Include all received headers in the response
 
-`whereami` has an additional feature flag that, when enabled, will include all received headers in its reply. If, in `k8s/configmap.yaml`, `ECHO_HEADERS` is set to `True`, the response payload will include a `headers` field, populated with the headers included in the client's request. 
+`whereami` has an additional feature flag that, when enabled, will include all received headers in its reply. If, in `k8s/configmap.yaml`, `ECHO_HEADERS` is set to `True`, the response payload will include a `headers` field, populated with the headers included in the client's request.
 
-#### Step 1 - Deploy whereami with header echoing enabled 
+#### Step 1 - Deploy whereami with header echoing enabled
 
 ```bash
 $ kubectl apply -k k8s-echo-headers-overlay-example
@@ -361,11 +384,11 @@ $ curl $ENDPOINT -s | jq .
 
 All of the prior examples for `whereami` are based on its default operating mode of using [Flask](https://flask.palletsprojects.com/en/1.1.x/) as its server. The following section details how `whereami` can be configured to use [gRPC](https://grpc.io/) instead.
 
-By setting the feature flag `GRPC_ENABLED` in the `whereami` configmap (see [here](k8s-grpc/configmap.yaml) to `"True"`, `whereami` can be interacted with using [gRPC](https://grpc.io/), with support for the gRPC [health check protocol](https://github.com/grpc/grpc/blob/master/doc/health-checking.md). The examples below leverage [grpcurl](https://github.com/fullstorydev/grpcurl), and assume you've already deployed a GKE cluster.
+By setting the feature flag `GRPC_ENABLED` in the `whereami` configmap (see [here](k8s-grpc/configmap.yaml)) to `"True"`, `whereami` can be interacted with using [gRPC](https://grpc.io/), with support for the gRPC [health check protocol](https://github.com/grpc/grpc/blob/master/doc/health-checking.md). The examples below leverage [grpcurl](https://github.com/fullstorydev/grpcurl), and assume you've already deployed a GKE cluster.
 
 If gRPC is enabled for a given pod, that `whereami` pod will not respond to HTTP requests, and any downstream service calls that the pod makes will also use gRPC only.
 
-> Note: because gRPC is used as the protocol, the `whereami-grpc` response will omit any `header` fields *and* listens on port `9090` instead of port `8080`.
+> Note: because gRPC is used as the protocol, the `whereami-grpc` response will omit any `header` fields *and* listens on port `9090` instead of port `8080`. 
 
 #### Step 1 - Deploy the whereami-grpc backend
 
@@ -379,7 +402,7 @@ service/whereami-grpc-backend created
 deployment.apps/whereami-grpc-backend created
 ```
 
-This backend will listen for gRPC requests from the frontend service deployed in the following step. 
+This backend will listen for gRPC requests from the frontend service deployed in the following step.
 
 #### Step 2 - Deploy the whereami-grpc frontend
 
@@ -393,7 +416,7 @@ service/whereami-grpc-frontend created
 deployment.apps/whereami-grpc-frontend created
 ```
 
-This frontend will both listen for gRPC requests from the user (described in the following step), and will make gRPC requests to the backend deployed in the prior step. 
+This frontend will both listen for gRPC requests from the user (described in the following step), and will make gRPC requests to the backend deployed in the prior step.
 
 #### Step 3 - Query whereami-grpc frontend
 
@@ -447,7 +470,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   wget && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* && \
-  wget -O /bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.3/grpc_health_probe-linux-amd64 && \ 
+  wget -O /bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.3.6/grpc_health_probe-linux-amd64 && \
   chmod +x /bin/grpc_health_probe
 USER cnb
 EOF
