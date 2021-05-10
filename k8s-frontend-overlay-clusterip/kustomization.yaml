@@ -1,6 +1,6 @@
 nameSuffix: "-backend"
 commonLabels:
-  app: whereami-backend
+  app: whereami-frontend
 bases:
 - ../k8s
 patches:
