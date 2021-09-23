@@ -25,7 +25,7 @@ class WhereamiPayload(object):
 
     def build_payload(self, request_headers):
 
-        # header propagation for HTTP calls to downstream services
+        # header propagation for HTTP calls to downward services
         def getForwardHeaders(request_headers):
             headers = {}
             incoming_headers = ['x-request-id',
@@ -67,7 +67,8 @@ class WhereamiPayload(object):
 
             logging.warning("Unable to capture zone.")
 
-        # get GKE node name
+        # get GKE node name - NOTE: switching to downward API
+        '''
         try:
             r = requests.get(METADATA_URL + 'instance/hostname',
                              headers=METADATA_HEADERS)
@@ -75,6 +76,13 @@ class WhereamiPayload(object):
                 self.payload['node_name'] = str(r.text)
         except:
 
+            logging.warning("Unable to capture node name.")
+        '''
+
+        # get node name via downward API
+        if os.getenv('NODE_NAME'):
+            self.payload['node_name'] = os.getenv('NODE_NAME')
+        else:
             logging.warning("Unable to capture node name.")
 
         # get GKE cluster name
@@ -100,7 +108,7 @@ class WhereamiPayload(object):
         self.payload['timestamp'] = datetime.now().replace(
             microsecond=0).isoformat()
 
-        # get namespace, pod ip, and pod service account via downstream API
+        # get namespace, pod ip, and pod service account via downward API
         if os.getenv('POD_NAMESPACE'):
             self.payload['pod_namespace'] = os.getenv('POD_NAMESPACE')
         else:

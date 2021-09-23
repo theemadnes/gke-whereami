@@ -16,7 +16,7 @@ spec:
       serviceAccountName: whereami-grpc-ksa
       containers:
       - name: whereami-grpc
-        image: gcr.io/google-samples/whereami:v1.2.1
+        image: gcr.io/google-samples/whereami:v1.2.2
         ports:
           - name: grpc
             containerPort: 9090
@@ -29,6 +29,10 @@ spec:
             command: ["/bin/grpc_health_probe", "-addr=:9090"]
           initialDelaySeconds: 10
         env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
           - name: POD_NAMESPACE
             valueFrom:
               fieldRef:

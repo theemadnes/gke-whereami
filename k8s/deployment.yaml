@@ -16,7 +16,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: gcr.io/google-samples/whereami:v1.2.1
+        image: gcr.io/google-samples/whereami:v1.2.2
         ports:
           - name: http
             containerPort: 8080
@@ -36,6 +36,10 @@ spec:
           initialDelaySeconds: 5
           timeoutSeconds: 1
         env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
           - name: POD_NAMESPACE
             valueFrom:
               fieldRef:
