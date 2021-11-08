@@ -7,6 +7,7 @@ import logging
 import requests
 # gRPC stuff
 import grpc
+from six import b
 import whereami_pb2
 import whereami_pb2_grpc
 
@@ -26,6 +27,7 @@ class WhereamiPayload(object):
     def build_payload(self, request_headers):
 
         # header propagation for HTTP calls to downward services
+        # for Istio / Anthos Service Mesh
         def getForwardHeaders(request_headers):
             headers = {}
             incoming_headers = ['x-request-id',
@@ -47,6 +49,39 @@ class WhereamiPayload(object):
 
             return headers
 
+        # call HTTP backend (expect JSON reesponse)
+        def call_http_backend(backend_service):
+
+            try:
+                r = requests.get(backend_service,
+                                 headers=getForwardHeaders(request_headers))
+                if r.ok:
+                    backend_result = r.json()
+                else:
+                    backend_result = None
+            except:
+
+                logging.warning(sys.exc_info()[0])
+                backend_result = None
+
+            return backend_result
+
+        # call gRPC backend
+        def call_grpc_backend(backend_service):
+
+            try:
+                channel = grpc.insecure_channel(backend_service +
+                                                ':9090')
+                stub = whereami_pb2_grpc.WhereamiStub(channel)
+                backend_result = stub.GetPayload(
+                    whereami_pb2.Empty())
+
+            except:
+                backend_result = None
+                logging.warning("Unable to capture backend result.")
+
+            return backend_result
+
         # get GCP project ID
         try:
             r = requests.get(METADATA_URL + 'project/project-id',
@@ -67,18 +102,6 @@ class WhereamiPayload(object):
 
             logging.warning("Unable to capture zone.")
 
-        # get GKE node name - NOTE: switching to downward API
-        '''
-        try:
-            r = requests.get(METADATA_URL + 'instance/hostname',
-                             headers=METADATA_HEADERS)
-            if r.ok:
-                self.payload['node_name'] = str(r.text)
-        except:
-
-            logging.warning("Unable to capture node name.")
-        '''
-
         # get node name via downward API
         if os.getenv('NODE_NAME'):
             self.payload['node_name'] = os.getenv('NODE_NAME')
@@ -87,7 +110,8 @@ class WhereamiPayload(object):
 
         # get GKE cluster name
         try:
-            r = requests.get(METADATA_URL + 'instance/attributes/cluster-name',
+            r = requests.get(METADATA_URL +
+                             'instance/attributes/cluster-name',
                              headers=METADATA_HEADERS)
             if r.ok:
                 self.payload['cluster_name'] = str(r.text)
@@ -132,38 +156,22 @@ class WhereamiPayload(object):
             logging.warning("Unable to capture metadata.")
 
         # should we call a backend service?
-        call_backend = os.getenv('BACKEND_ENABLED')
+        if os.getenv('BACKEND_ENABLED') == 'True':
 
-        if call_backend == 'True':
-
+            print("making a call")
             backend_service = os.getenv('BACKEND_SERVICE')
 
             if os.getenv('GRPC_ENABLED') == "True":
 
-                try:
-                    channel = grpc.insecure_channel(backend_service + ':9090')
-                    stub = whereami_pb2_grpc.WhereamiStub(channel)
-                    self.payload['backend_result'] = stub.GetPayload(
-                        whereami_pb2.Empty())
+                backend_result = call_grpc_backend(backend_service)
 
-                except:
-                    logging.warning("Unable to capture backend result.")
+                if backend_result:
+
+                    self.payload['backend_result'] = backend_result
 
             else:
 
-                try:
-                    r = requests.get(backend_service,
-                                     headers=getForwardHeaders(request_headers))
-                    if r.ok:
-                        backend_result = r.json()
-                    else:
-                        backend_result = None
-                except:
-
-                    print(sys.exc_info()[0])
-                    backend_result = None
-
-                self.payload['backend_result'] = backend_result
+                self.payload['backend_result'] = call_http_backend(backend_service)
 
         echo_headers = os.getenv('ECHO_HEADERS')
 
