@@ -1,31 +1,28 @@
 from flask import Flask, request, Response, jsonify
 import logging
+from logging.config import dictConfig
 import sys
 import os
 from flask_cors import CORS
 import whereami_payload
-
+# gRPC stuff
 from concurrent import futures
 import multiprocessing
-
 import grpc
-
 from grpc_reflection.v1alpha import reflection
 from grpc_health.v1 import health
 from grpc_health.v1 import health_pb2
 from grpc_health.v1 import health_pb2_grpc
-
+# whereami protobufs
 import whereami_pb2
 import whereami_pb2_grpc
-
 # Prometheus export setup
 from prometheus_flask_exporter import PrometheusMetrics
 from py_grpc_prometheus.prometheus_server_interceptor import PromServerInterceptor
 from prometheus_client import start_http_server
-
 # OpenTelemetry setup
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
 os.environ["OTEL_PYTHON_FLASK_EXCLUDED_URLS"] = "healthz,metrics"  # set exclusions
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry import trace
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
@@ -37,26 +34,63 @@ from opentelemetry.propagators.cloud_trace_propagator import (
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
 
-# Set trace sampling
-sampler = TraceIdRatioBased(1/10)  # sample 10% of requests
+# set up logging
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://sys.stdout',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
 
-# OTEL setup
-set_global_textmap(CloudTraceFormatPropagator())
+# check to see if tracing enabled and sampling probability
+trace_sampling_ratio = 0  # default to not sampling if absense of environment var
+if os.getenv("TRACE_SAMPLING_RATIO"):
 
-tracer_provider = TracerProvider(sampler=sampler)
-cloud_trace_exporter = CloudTraceSpanExporter()
-tracer_provider.add_span_processor(
-    # BatchSpanProcessor buffers spans and sends them in batches in a
-    # background thread. The default parameters are sensible, but can be
-    # tweaked to optimize your performance
-    BatchSpanProcessor(cloud_trace_exporter)
-)
-trace.set_tracer_provider(tracer_provider)
+    try:
+        trace_sampling_ratio = float(os.getenv("TRACE_SAMPLING_RATIO"))
+    except:
+        logging.warning("Invalid trace ratio provided.")  # invalid value? just keep at 0%
 
-tracer = trace.get_tracer(__name__)
+# if tracing is desired, set up trace provider / exporter
+if trace_sampling_ratio > 0:
+    logging.info("Attempting to enable tracing.")
+
+    sampler = TraceIdRatioBased(trace_sampling_ratio)
+
+    # OTEL setup
+    set_global_textmap(CloudTraceFormatPropagator())
+
+    tracer_provider = TracerProvider(sampler=sampler)
+    cloud_trace_exporter = CloudTraceSpanExporter()
+    tracer_provider.add_span_processor(
+        # BatchSpanProcessor buffers spans and sends them in batches in a
+        # background thread. The default parameters are sensible, but can be
+        # tweaked to optimize your performance
+        BatchSpanProcessor(cloud_trace_exporter)
+    )
+    trace.set_tracer_provider(tracer_provider)
+
+    tracer = trace.get_tracer(__name__)
+    logging.info("Tracing enabled.")
+
+else:
+    logging.info("Tracing disabled.")
 
 # flask setup
 app = Flask(__name__)
+handler = logging.StreamHandler(sys.stdout)
+app.logger.addHandler(handler)
+#app.logger.propagate = True
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()  # enable tracing for Requests
 app.config['JSON_AS_ASCII'] = False  # otherwise our emojis get hosed
@@ -145,16 +179,6 @@ def home(path):
     return jsonify(payload)
 
 if __name__ == '__main__':
-    out_hdlr = logging.StreamHandler(sys.stdout)
-    fmt = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    out_hdlr.setFormatter(fmt)
-    out_hdlr.setLevel(logging.INFO)
-    logging.getLogger().addHandler(out_hdlr)
-    logging.getLogger().setLevel(logging.INFO)
-    app.logger.handlers = []
-    app.logger.propagate = True
-    app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
     # decision point - HTTP or gRPC?
     if os.getenv('GRPC_ENABLED') == "True":

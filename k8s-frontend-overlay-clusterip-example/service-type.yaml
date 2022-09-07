@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# [START gke_k8s_backend_overlay_example_service_type_service_whereami]
+# [START gke_k8s_frontend_overlay_clusterip_example_service_type_service_whereami]
 apiVersion: "v1"
 kind: "Service"
 metadata:
   name: "whereami"
 spec:
   type: ClusterIP
-# [END gke_k8s_backend_overlay_example_service_type_service_whereami]
+# [END gke_k8s_frontend_overlay_clusterip_example_service_type_service_whereami]
 ---
