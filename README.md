@@ -19,7 +19,7 @@ Prometheus metrics are exposed from `whereami` at `x.x.x.x/metrics` in both Flas
 `whereami` is a single-container app, designed and packaged to run on Kubernetes. In its simplest form it can be deployed in a single line with only a few parameters.
 
 ```bash
-$ kubectl run --image=us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.9 --expose --port 8080 whereami
+$ kubectl run --image=us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.10 --expose --port 8080 whereami
 ```
 
 The `whereami`  pod listens on port `8080` and returns a very simple JSON response that indicates who is responding and where they live. This example assumes you're executing the `curl` command from a pod in the same K8s cluster & namespace (although the following examples show how to access from external clients):
@@ -104,7 +104,7 @@ spec:
       serviceAccountName: whereami-ksa
       containers:
       - name: whereami
-        image: us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.9
+        image: us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.10
         ports:
           - name: http
             containerPort: 8080 #The application is listening on port 8080
