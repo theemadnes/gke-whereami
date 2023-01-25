@@ -1,4 +1,4 @@
-> THIS REPO IS NO LONGER MAINTAINED - it has been moved over to Google Cloud's [kubernetes-engine-samples repository](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/main/whereami)
+# THIS REPO IS NO LONGER MAINTAINED - it has been moved over to Google Cloud's [kubernetes-engine-samples repository](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/main/whereami)
 
 # whereami
 
