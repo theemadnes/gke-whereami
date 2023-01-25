@@ -1,4 +1,4 @@
-# THIS REPO IS NO LONGER MAINTAINED - it has been moved over to Google Cloud's [kubernetes-engine-samples repository](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/main/whereami)
+# 🚨🚨🚨 THIS REPO IS NO LONGER MAINTAINED - it has been moved over to Google Cloud's [kubernetes-engine-samples repository](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/main/whereami) 🚨🚨🚨
 
 # whereami
 
@@ -498,3 +498,5 @@ docker push gcr.io/${PROJECT_ID}/whereami-run-image
 ```pack build --builder gcr.io/buildpacks/builder:v1 --publish gcr.io/${PROJECT_ID}/whereami --run-image gcr.io/${PROJECT_ID}/whereami-run-image```
 
 Recently, [cURL](https://curl.se/) was added to `/bin` of the container image for additional testing capability.
+
+# 🚨🚨🚨 THIS REPO IS NO LONGER MAINTAINED - it has been moved over to Google Cloud's [kubernetes-engine-samples repository](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/main/whereami) 🚨🚨🚨
