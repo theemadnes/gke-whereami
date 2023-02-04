@@ -98,8 +98,8 @@ CORS(app)  # enable CORS
 metrics = PrometheusMetrics(app)  # enable Prom metrics
 
 # gRPC setup
-grpc_serving_port = 9090
-grpc_metrics_port = 8080  # prometheus /metrics, same as flask port
+grpc_serving_port = int(os.environ.get('PORT', 9090)) # configurable via `PORT` but default to 9090
+grpc_metrics_port = 8000  # prometheus /metrics
 
 # define Whereami object
 whereami_payload = whereami_payload.WhereamiPayload()
@@ -182,7 +182,7 @@ if __name__ == '__main__':
 
     # decision point - HTTP or gRPC?
     if os.getenv('GRPC_ENABLED') == "True":
-        logging.info("gRPC server listening on port 9090")
+        logging.info('gRPC server listening on port %s'%(grpc_serving_port))
         grpc_serve()
 
     else:

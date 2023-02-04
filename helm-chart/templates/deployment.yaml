@@ -13,25 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# [START gke_k8s_grpc_deployment_deployment_whereami_grpc]
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: whereami-grpc
   labels:
-    app: whereami-grpc
+    app: {{ include "whereami.fullname" . }}
+  name: {{ include "whereami.fullname" . }}
+  namespace: {{.Release.Namespace}}
 spec:
-  replicas: 3
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: whereami-grpc
+      app: {{ include "whereami.fullname" . }}
   template:
     metadata:
       labels:
-        app: whereami-grpc
+        app: {{ include "whereami.fullname" . }}
         version: v1
     spec:
-      serviceAccountName: whereami-grpc
+      serviceAccountName: {{ include "whereami.fullname" . }}
       securityContext:
         fsGroup: 1000
         runAsGroup: 1000
@@ -46,12 +46,15 @@ spec:
               - all
           privileged: false
           readOnlyRootFilesystem: true
-        image: us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.19
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
         ports:
+          {{- if .Values.config.grpc.enabled }}
           - name: grpc
             containerPort: 9090
+          {{- end }}
           - name: http
-            containerPort: 8000 # prom metrics
+            containerPort: 8080
+        {{- if .Values.config.grpc.enabled }}
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:9090"]
@@ -60,6 +63,23 @@ spec:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:9090"]
           initialDelaySeconds: 10
+        {{- else }}
+        livenessProbe:
+          httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        {{- end }}
         env:
           - name: NODE_NAME
             valueFrom:
@@ -80,32 +100,30 @@ spec:
           - name: BACKEND_ENABLED
             valueFrom:
               configMapKeyRef:
-                name: whereami-grpc
+                name: {{ include "whereami.fullname" . }}
                 key: BACKEND_ENABLED
           - name: BACKEND_SERVICE
             valueFrom:
               configMapKeyRef:
-                name: whereami-grpc
+                name: {{ include "whereami.fullname" . }}
                 key: BACKEND_SERVICE
           - name: METADATA
             valueFrom:
               configMapKeyRef:
-                name: whereami-grpc
+                name: {{ include "whereami.fullname" . }}
                 key: METADATA
           - name: ECHO_HEADERS
             valueFrom:
               configMapKeyRef:
-                name: whereami-grpc
+                name: {{ include "whereami.fullname" . }}
                 key: ECHO_HEADERS
           - name: GRPC_ENABLED
             valueFrom:
               configMapKeyRef:
-                name: whereami-grpc
+                name: {{ include "whereami.fullname" . }}
                 key: GRPC_ENABLED
           - name: TRACE_SAMPLING_RATIO
             valueFrom:
               configMapKeyRef:
-                name: whereami-grpc
+                name: {{ include "whereami.fullname" . }}
                 key: TRACE_SAMPLING_RATIO
-# [END gke_k8s_grpc_deployment_deployment_whereami_grpc]
----

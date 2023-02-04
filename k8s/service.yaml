@@ -14,17 +14,20 @@
 # limitations under the License.
 
 # [START gke_k8s_service_service_whereami]
-apiVersion: "v1"
-kind: "Service"
+apiVersion: v1
+kind: Service
 metadata:
-  name: "whereami"
+  labels:
+    app: whereami
+  name: whereami
 spec:
   ports:
   - port: 80
+    protocol: TCP
     targetPort: 8080
     name: http # adding for Istio
   selector:
-    app: "whereami"
-  type: "LoadBalancer"
+    app: whereami
+  type: LoadBalancer
 # [END gke_k8s_service_service_whereami]
 ---

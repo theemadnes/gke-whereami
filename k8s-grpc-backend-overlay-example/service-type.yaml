@@ -14,10 +14,10 @@
 # limitations under the License.
 
 # [START gke_k8s_grpc_backend_overlay_example_service_type_service_whereami_grpc]
-apiVersion: "v1"
-kind: "Service"
+apiVersion: v1
+kind: Service
 metadata:
-  name: "whereami-grpc"
+  name: whereami-grpc
 spec:
   type: ClusterIP
 # [END gke_k8s_grpc_backend_overlay_example_service_type_service_whereami_grpc]

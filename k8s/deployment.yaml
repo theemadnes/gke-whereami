@@ -17,6 +17,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  labels:
+    app: whereami
   name: whereami
 spec:
   replicas: 3
@@ -29,10 +31,22 @@ spec:
         app: whereami
         version: v1
     spec:
-      serviceAccountName: whereami-ksa
+      serviceAccountName: whereami
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
       containers:
       - name: whereami
-        image: us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.10
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - all
+          privileged: false
+          readOnlyRootFilesystem: true
+        image: us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.19
         ports:
           - name: http
             containerPort: 8080
@@ -71,32 +85,32 @@ spec:
           - name: BACKEND_ENABLED
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami
                 key: BACKEND_ENABLED
           - name: BACKEND_SERVICE
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami
                 key: BACKEND_SERVICE
           - name: METADATA
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami
                 key: METADATA
           - name: ECHO_HEADERS
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami
                 key: ECHO_HEADERS
           - name: GRPC_ENABLED
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami
                 key: GRPC_ENABLED
           - name: TRACE_SAMPLING_RATIO
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami
                 key: TRACE_SAMPLING_RATIO
 # [END gke_k8s_deployment_deployment_whereami]
 ---

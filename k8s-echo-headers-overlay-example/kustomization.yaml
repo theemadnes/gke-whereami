@@ -1,6 +1,6 @@
 nameSuffix: "-echo-headers"
 commonLabels:
-  app: whereami-headers
+  app: whereami-echo-headers
 bases:
 - ../k8s
 patches:

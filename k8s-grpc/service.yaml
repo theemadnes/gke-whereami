@@ -14,17 +14,20 @@
 # limitations under the License.
 
 # [START gke_k8s_grpc_service_service_whereami_grpc]
-apiVersion: "v1"
-kind: "Service"
+apiVersion: v1
+kind: Service
 metadata:
-  name: "whereami-grpc"
+  labels:
+    app: whereami-grpc
+  name: whereami-grpc
 spec:
   ports:
   - port: 9090
     protocol: TCP
+    targetPort: 9090
     name: grpc # adding for Istio
   selector:
-    app: "whereami-grpc"
-  type: "LoadBalancer"
+    app: whereami-grpc
+  type: LoadBalancer
 # [END gke_k8s_grpc_service_service_whereami_grpc]
 ---

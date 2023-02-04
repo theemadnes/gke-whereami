@@ -1,7 +1,5 @@
 # 🚨🚨 THIS REPO IS NO LONGER MAINTAINED - it has been moved over to Google Cloud's [kubernetes-engine-samples repository](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/main/whereami) 🚨🚨
 
-# whereami
-
 [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/kubernetes-engine-samples&cloudshell_tutorial=README.md&cloudshell_workspace=whereami/)
 
 `whereami` is a simple Kubernetes-oriented python app for describing the location of the pod serving a request via its attributes (cluster name, cluster region, pod name, namespace, service account, etc). This is useful for a variety of demos where you just need to understand how traffic is getting to and returning from your app.
@@ -12,7 +10,7 @@
 
 Tracing to `whereami` is instrumented via [OpenTelemetry](https://cloud.google.com/trace/docs/setup/python-ot) when in default Flask mode, and will export traces to Cloud Trace when run on GCP. The `TRACE_SAMPLING_RATIO` value in the ConfigMap can be used to configure sampling likelihood.
 
-Prometheus metrics are exposed from `whereami` at `x.x.x.x/metrics` in both Flask and gRPC modes.
+Prometheus metrics are exposed from `whereami` at `x.x.x.x/metrics` in both Flask and gRPC modes. In gRPC mode, the `metrics` endpoint is exposed on port `8000` via `HTTP`.
 
 > Note: when running the `whereami` pod(s) with [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) enabled, make sure that the associated GSA has a role attached to it with permissions to write to Cloud Trace, such as `roles/cloudtrace.agent`
 
@@ -21,7 +19,7 @@ Prometheus metrics are exposed from `whereami` at `x.x.x.x/metrics` in both Flas
 `whereami` is a single-container app, designed and packaged to run on Kubernetes. In its simplest form it can be deployed in a single line with only a few parameters.
 
 ```bash
-$ kubectl run --image=us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.10 --expose --port 8080 whereami
+$ kubectl run --image=us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.19 --expose --port 8080 whereami
 ```
 
 The `whereami`  pod listens on port `8080` and returns a very simple JSON response that indicates who is responding and where they live. This example assumes you're executing the `curl` command from a pod in the same K8s cluster & namespace (although the following examples show how to access from external clients):
@@ -37,7 +35,7 @@ $ curl 10.12.0.4:8080
   "pod_name": "whereami-6f5545f49c-8thlp", 
   "pod_name_emoji": "👱🏼", 
   "pod_namespace": "default", 
-  "pod_service_account": "whereami-ksa", 
+  "pod_service_account": "whereami", 
   "project_id": "alexmattson-scratch", 
   "timestamp": "2020-12-13T05:49:40", 
   "zone": "us-central1-b"
@@ -103,10 +101,10 @@ spec:
       labels:
         app: whereami
     spec:
-      serviceAccountName: whereami-ksa
+      serviceAccountName: whereami
       containers:
       - name: whereami
-        image: us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.10
+        image: us-docker.pkg.dev/google-samples/containers/gke/whereami:v1.2.19
         ports:
           - name: http
             containerPort: 8080 #The application is listening on port 8080
@@ -145,17 +143,17 @@ spec:
           - name: BACKEND_ENABLED #If true, enables queries from whereami to a specified Service name or IP. Requires BACKEND_SERVICE to be set.
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami
                 key: BACKEND_ENABLED
           - name: BACKEND_SERVICE #Configures the name or IP of the endpoint that whereami will query.
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami
                 key: BACKEND_SERVICE
           - name: METADATA #An arbitrary metadata field that can be used to label JSON responses
             valueFrom:
               configMapKeyRef:
-                name: whereami-configmap
+                name: whereami
                 key: METADATA
 ```
 
@@ -170,8 +168,8 @@ resources:
 - configmap.yaml
 
 $ kubectl apply -k k8s
-serviceaccount/whereami-ksa created
-configmap/whereami-configmap created
+serviceaccount/whereami created
+configmap/whereami created
 service/whereami created
 deployment.apps/whereami created
 ```
@@ -200,7 +198,7 @@ $ curl $ENDPOINT
   "pod_name": "whereami-6f5545f49c-nkjdg", 
   "pod_name_emoji": "👊", 
   "pod_namespace": "default", 
-  "pod_service_account": "whereami-ksa", 
+  "pod_service_account": "whereami", 
   "project_id": "alexmattson-scratch", 
   "timestamp": "2020-12-13T05:44:47", 
   "zone": "us-central1-c"
@@ -239,19 +237,19 @@ Deploy `whereami` again using the manifests from [k8s-backend-overlay-example](k
 
 ```bash
 $ kubectl apply -k k8s-backend-overlay-example
-serviceaccount/whereami-ksa-backend created
-configmap/whereami-configmap-backend created
+serviceaccount/whereami-backend created
+configmap/whereami-backend created
 service/whereami-backend created
 deployment.apps/whereami-backend created
 ```
 
-`configmap/whereami-configmap-backend` has the following fields configured:
+`configmap/whereami-backend` has the following fields configured:
 
 ```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: whereami-configmap
+  name: whereami
 data:
   BACKEND_ENABLED: "False" # assuming you don't want a chain of backend calls
   METADATA:        "backend"
@@ -278,7 +276,7 @@ Now we're going to deploy the `whereami` frontend from the `k8s-frontend-overlay
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: whereami-configmap
+  name: whereami
 data:
   BACKEND_ENABLED: "True" #This enables requests to be send to the backend
   # when defining the BACKEND_SERVICE using an HTTP protocol, indicate HTTP or HTTPS; if using gRPC, use the host name only
@@ -290,8 +288,8 @@ Deploy the frontend:
 
 ```bash
 $ kubectl apply -k k8s-frontend-overlay-example
-serviceaccount/whereami-ksa-frontend created
-configmap/whereami-configmap-frontend created
+serviceaccount/whereami-frontend created
+configmap/whereami-frontend created
 service/whereami-frontend created
 deployment.apps/whereami-frontend created
 ```
@@ -318,7 +316,7 @@ $ curl $ENDPOINT -s | jq .
     "pod_name": "whereami-backend-769bdff967-6plr6",
     "pod_name_emoji": "🤦🏾‍♀️",
     "pod_namespace": "multi-cluster-demo",
-    "pod_service_account": "whereami-ksa-backend",
+    "pod_service_account": "whereami-backend",
     "project_id": "church-243723",
     "timestamp": "2020-08-02T23:38:56",
     "zone": "us-east4-a"
@@ -331,7 +329,7 @@ $ curl $ENDPOINT -s | jq .
   "pod_name": "whereami-frontend-5ddd6bc84c-nkrds",
   "pod_name_emoji": "🏃🏻‍♀️",
   "pod_namespace": "multi-cluster-demo",
-  "pod_service_account": "whereami-ksa-frontend",
+  "pod_service_account": "whereami-frontend",
   "project_id": "church-243723",
   "timestamp": "2020-08-02T23:38:56",
   "zone": "us-east4-a"
@@ -355,8 +353,8 @@ $ for i in {1..3}; do curl $ENDPOINT -s | jq '{frontend: .pod_name_emoji, backen
 
 ```bash
 $ kubectl apply -k k8s-echo-headers-overlay-example
-serviceaccount/whereami-ksa-frontend created
-configmap/whereami-configmap-frontend created
+serviceaccount/whereami-frontend created
+configmap/whereami-frontend created
 service/whereami-frontend created
 deployment.apps/whereami-frontend created
 ```
@@ -387,7 +385,7 @@ $ curl $ENDPOINT -s | jq .
   "pod_name": "whereami-echo-headers-78766fb94f-ggmcb",
   "pod_name_emoji": "🧑🏿",
   "pod_namespace": "default",
-  "pod_service_account": "whereami-ksa-echo-headers",
+  "pod_service_account": "whereami-echo-headers",
   "project_id": "alexmattson-scratch",
   "timestamp": "2020-08-11T18:21:58",
   "zone": "us-central1-c"
@@ -402,7 +400,7 @@ By setting the feature flag `GRPC_ENABLED` in the `whereami` configmap (see [her
 
 If gRPC is enabled for a given pod, that `whereami` pod will not respond to HTTP requests, and any downstream service calls that the pod makes will also use gRPC only.
 
-> Note: because gRPC is used as the protocol, the `whereami-grpc` response will omit any `header` fields *and* listens on port `9090` instead of port `8080`. 
+> Note: because gRPC is used as the protocol, the `whereami-grpc` response will omit any `header` fields *and* listens on port `9090` instead of port `8080` by default, but can be configured via the `$PORT` environment variable.
 
 #### Step 1 - Deploy the whereami-grpc backend
 
@@ -410,8 +408,8 @@ Deploy the `whereami-grpc` backend using the manifests from [k8s-grpc-backend-ov
 
 ```bash
 $ kubectl apply -k k8s-grpc-backend-overlay-example
-serviceaccount/whereami-grpc-ksa-backend created
-configmap/whereami-grpc-configmap-backend created
+serviceaccount/whereami-grpc-backend created
+configmap/whereami-grpc-backend created
 service/whereami-grpc-backend created
 deployment.apps/whereami-grpc-backend created
 ```
@@ -424,8 +422,8 @@ Now we're going to deploy the `whereami-grpc` frontend from the [k8s-grpc-fronte
 
 ```bash
 $ kubectl apply -k k8s-grpc-frontend-overlay-example
-serviceaccount/whereami-grpc-ksa-frontend created
-configmap/whereami-grpc-configmap-frontend created
+serviceaccount/whereami-grpc-frontend created
+configmap/whereami-grpc-frontend created
 service/whereami-grpc-frontend created
 deployment.apps/whereami-grpc-frontend created
 ```
@@ -453,7 +451,7 @@ $ grpcurl -plaintext $ENDPOINT:9090 whereami.Whereami.GetPayload | jq .
     "podName": "whereami-grpc-backend-f9b79888d-mcbxv",
     "podNameEmoji": "🤒",
     "podNamespace": "default",
-    "podServiceAccount": "whereami-grpc-ksa-backend",
+    "podServiceAccount": "whereami-grpc-backend",
     "projectId": "alexmattson-scratch",
     "timestamp": "2020-10-22T05:10:58",
     "zone": "us-central1-c"
@@ -465,7 +463,7 @@ $ grpcurl -plaintext $ENDPOINT:9090 whereami.Whereami.GetPayload | jq .
   "pod_name": "whereami-grpc-frontend-88b54bc6-9w8cc",
   "pod_name_emoji": "🇸🇦",
   "pod_namespace": "default",
-  "pod_service_account": "whereami-grpc-ksa-frontend",
+  "pod_service_account": "whereami-grpc-frontend",
   "project_id": "alexmattson-scratch",
   "timestamp": "2020-10-22T05:10:58",
   "zone": "us-central1-f"
@@ -473,6 +471,49 @@ $ grpcurl -plaintext $ENDPOINT:9090 whereami.Whereami.GetPayload | jq .
 ```
 
 ### Notes
+
+#### Cloud Run
+
+When using gRPC for `whereami` on Cloud Run, HTTP/2 must be [enabled](https://cloud.google.com/run/docs/configuring/http2) for the Cloud Run revision.
+
+```bash
+$ grpcurl whereami-4uotx33u2a-uc.a.run.app:443  whereami.Whereami/GetPayload
+{
+  "pod_name": "localhost",
+  "pod_name_emoji": "👩🏻‍🔬",
+  "project_id": "am-arg-01",
+  "timestamp": "2022-12-18T01:55:56",
+  "zone": "us-central1-1",
+  "gce_instance_id": "0071bb481503eabfa986564835af469bc819c7c1bbb5a262267f5dac714a989324abe2907490f31a0b7baa78e0ccf715b955ee306ae8e6469c83258a01a1c402c8",
+  "gce_service_account": "841101411908-compute@developer.gserviceaccount.com"
+}
+```
+
+When enabling backend in Cloud Run using gRPC:
+
+```bash
+$ grpcurl whereami-4uotx33u2a-uc.a.run.app:443  whereami.Whereami/GetPayload
+{
+  "backend_result": {
+    "pod_name": "localhost",
+    "pod_name_emoji": "👩🏿‍❤️‍💋‍👨🏼",
+    "project_id": "am-arg-01",
+    "timestamp": "2022-12-18T04:51:00",
+    "zone": "us-central1-1",
+    "gce_instance_id": "0071bb481538d20cdd71482479441202997c112a395a4308ee799f7151c31483ded5745b8ddc1cd577e56fbf1458c12dd15cfc55852f12c96ab5dae7590ba15cc4",
+    "gce_service_account": "whereami-backend@am-arg-01.iam.gserviceaccount.com"
+  },
+  "pod_name": "localhost",
+  "pod_name_emoji": "👩🏾‍❤️‍👩🏻",
+  "project_id": "am-arg-01",
+  "timestamp": "2022-12-18T04:51:00",
+  "zone": "us-central1-1",
+  "gce_instance_id": "0071bb4815da6cf73029c03a21cb16f3fac22031e3f33d3d1749ab2aa683ec2fb83e85151a10908296d54d518352b0b59bba90d39c83ad31d69997e10732e76c34",
+  "gce_service_account": "841101411908-compute@developer.gserviceaccount.com"
+}
+```
+
+#### Buildpacks
 
 If you'd like to build & publish via Google's [buildpacks](https://github.com/GoogleCloudPlatform/buildpacks), something like this should do the trick (leveraging the local `Procfile`) from this directory:
 
@@ -484,9 +525,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   wget && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* && \
-  wget -O /bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.7/grpc_health_probe-linux-amd64 && \ 
+  wget -O /bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.14/grpc_health_probe-linux-amd64 && \
   chmod +x /bin/grpc_health_probe && \
-  wget -O /bin/curl https://github.com/moparisthebest/static-curl/releases/download/v7.81.0/curl-amd64 && \ 
+  wget -O /bin/curl https://github.com/moparisthebest/static-curl/releases/download/v7.86.0/curl-amd64 && \
   chmod +x /bin/curl
 USER cnb
 EOF
@@ -499,4 +540,43 @@ docker push gcr.io/${PROJECT_ID}/whereami-run-image
 
 Recently, [cURL](https://curl.se/) was added to `/bin` of the container image for additional testing capability.
 
-# 🚨🚨 THIS REPO IS NO LONGER MAINTAINED - it has been moved over to Google Cloud's [kubernetes-engine-samples repository](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/main/whereami) 🚨🚨
+
+#### Helm
+
+If you'd like to deploy `whereami` via its Helm chart, you could leverage the following instructions.
+
+Deploy the default setup of `whereami` (HTTP frontend):
+```sh
+helm install whereami oci://us-docker.pkg.dev/google-samples/charts/whereami \
+    --version 1.2.19
+```
+
+Deploy `whereami` as HTTP backend by running the previous `helm install` command with the following parameters:
+```sh
+--set suffix=-backend,config.metadata=backend,service.type=ClusterIP
+```
+
+Deploy `whereami` as HTTP frontend with backend by running the previous `helm install` command with the following parameters:
+```sh
+--set suffix=-frontend,config.metadata=frontend,config.backend.enabled=true
+```
+
+Deploy `whereami` as echo headers by running the previous `helm install` command with the following parameters:
+```sh
+--set suffix=-echo-headers,config.metadata=echo_headers_enabled,config.echoHeaders.enabled=true
+```
+
+Deploy `whereami` as gRPC frontend by running the previous `helm install` command with the following parameters:
+```sh
+--set nameOverride=whereami-grpc,config.metadata=grpc-frontend,config.backend.service=whereami-grpc-backend,config.grpc.enabled=true,service.port=9090,service.name=grpc,service.targetPort=9090
+```
+
+Deploy `whereami` as gRPC backend by running the previous `helm install` command with the following parameters:
+```sh
+--set suffix=-backend,nameOverride=whereami-grpc,config.metadata=grpc-backend,config.backend.service=whereami-grpc-backend,config.grpc.enabled=true,service.port=9090,service.name=grpc,service.targetPort=9090,service.type=ClusterIP
+```
+
+Deploy `whereami` as gRPC backend with backend by running the previous `helm install` command with the following parameters:
+```sh
+--set suffix=-frontend,nameOverride=whereami-grpc,config.metadata=grpc-frontend,config.backend.enabled=true,config.backend.service=whereami-grpc-backend,config.grpc.enabled=true,service.port=9090,service.name=grpc,service.targetPort=9090
+```

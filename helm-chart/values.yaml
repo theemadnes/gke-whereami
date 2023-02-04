@@ -1,0 +1,33 @@
+# Default values for whereami.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+suffix: ""
+# Overrides the name of the resources whose default is the chart name.
+nameOverride: ""
+
+replicaCount: 3
+
+image:
+  repository: us-docker.pkg.dev/google-samples/containers/gke/whereami
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 8080
+  protocol: TCP
+  name: http
+
+config:
+  backend:
+    enabled: false # flag to enable backend service call "false" || "true"
+    # when defining the BACKEND_SERVICE using an HTTP protocol, indicate HTTP or HTTPS; if using gRPC, use the host name only
+    service: "http://whereami-backend" # substitute with corresponding service name - this example assumes both services are in the same namespace
+  metadata: "frontend" # arbitrary string that gets returned in payload - can be used to track which services you're interacting with 
+  echoHeaders:
+    enabled: false # flag to enable the payload including all headers received in the `echo_headers` field if set to true
+  grpc:
+    enabled: false # flag to switch whereami service to gRPC mode
+  traceSamplingRatio: "0.00" # trace sampling ratio; i.e. the % likelyhood a trace will be sent to Cloud Trace; setting to zero disables tracing; expects float. "0.10" == 10%

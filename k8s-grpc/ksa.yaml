@@ -17,6 +17,8 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: whereami-grpc-ksa
+  labels:
+    app: whereami-grpc
+  name: whereami-grpc
 # [END gke_k8s_grpc_ksa_serviceaccount_whereami_grpc_ksa]
 ---
