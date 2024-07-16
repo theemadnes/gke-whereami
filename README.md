@@ -1,4 +1,4 @@
-# 🚨🚨 THIS REPO IS NO LONGER MAINTAINED - it has been moved over to Google Cloud's [kubernetes-engine-samples repository](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/main/whereami) 🚨🚨
+# 🚨🚨 THIS REPO IS NO LONGER MAINTAINED - it has been moved over to Google Cloud's [kubernetes-engine-samples repository](https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/tree/main/quickstarts/whereami) 🚨🚨
 
 [![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.svg)](https://ssh.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https://github.com/GoogleCloudPlatform/kubernetes-engine-samples&cloudshell_tutorial=README.md&cloudshell_workspace=whereami/)
 
